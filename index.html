@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulky Hit Studio | Global Indie Vision</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="Style.css">
+    <style>
+/* Embedded styles (from user) */
+:root {
+    --bg-dark: #000000;
+    --bg-card: rgba(10, 10, 10, 0.9);
+    --primary-green: #cdff00;
+    --secondary-green: #b8ff00;
+    --godot-blue: #00ff00;
+    --text-main: #ffffff;
+    --text-muted: #a0a0b0;
+    --font-head: 'Orbitron', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* Custom Animated Cursor */
+body::before {
+    content: '';
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, var(--primary-green) 0%, rgba(205, 255, 0, 0.4) 100%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 0 15px var(--primary-green);
+    animation: cursor-pulse 1.5s ease-in-out infinite;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    width: 5px;
+    height: 5px;
+    background: var(--primary-green);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+}
+
+@keyframes cursor-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+}
+
+/* Moving Grid Background */
+.cyber-grid {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: linear-gradient(rgba(205, 255, 0, 0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(205, 255, 0, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: -1;
+    animation: grid-scroll 3s linear infinite;
+}
+
+@keyframes grid-scroll {
+    from { transform: translateY(0); }
+    to { transform: translateY(50px); }
+}
+
+nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 5%; position: fixed; width: 100%; top: 0; z-index: 100;
+    background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+    border-bottom: none;
+}
+
+.logo { font-family: var(--font-head); font-weight: 700; color: var(--primary-green); font-size: 1.4rem; }
+
+.nav-btn {
+    background: transparent; border: none;
+    color: var(--primary-green); padding: 8px 18px; font-family: var(--font-head);
+    cursor: pointer; transition: 0.2s;
+}
+
+.nav-btn:hover { background: transparent; color: var(--secondary-green); box-shadow: 0 0 15px var(--primary-green); }
+
+/* Hero */
+.hero { height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; }
+.hero-content h1 { font-family: var(--font-head); font-size: clamp(2.5rem, 8vw, 5rem); line-height: 1; }
+.subtitle { font-size: 1.2rem; color: var(--text-muted); margin: 20px 0 40px; }
+
+.gradient-text {
+    background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.cta-btn {
+    padding: 18px 45px; background: var(--primary-green); color: #000;
+    font-family: var(--font-head); font-weight: 900; border: 2px solid var(--primary-green);
+    cursor: pointer; transition: 0.1s; box-shadow: 0 0 20px var(--primary-green);
+    clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+}
+
+.cta-btn:hover { transform: scale(1.05); background: #fff; box-shadow: 0 0 40px var(--primary-green); }
+
+/* Cards */
+.container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+.glass-card, .engine-card, .founder-card {
+    background: var(--bg-card); border: none;
+    padding: 50px; border-radius: 15px; backdrop-filter: blur(10px); text-align: center;
+}
+
+.section-title { font-family: var(--font-head); color: var(--primary-green); margin-bottom: 25px; }
+.vision-statement { font-size: 1.4rem; font-weight: 300; margin-bottom: 30px; }
+.vision-bar { display: flex; justify-content: space-around; font-family: var(--font-head); font-size: 0.8rem; color: var(--primary-green); }
+
+.game-description-card {
+    background: var(--bg-card); border: none;
+    padding: 50px; border-radius: 15px; backdrop-filter: blur(10px); text-align: center;
+}
+
+.game-narrative {
+    line-height: 2;
+    font-size: 1.1rem;
+}
+
+.narrative-line {
+    margin: 15px 0;
+    color: #e6ecff;
+    font-weight: 300;
+}
+
+.secret-text {
+    color: var(--primary-green);
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(205, 255, 0, 0.5);
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { text-shadow: 0 0 10px rgba(205, 255, 0, 0.5); }
+    50% { text-shadow: 0 0 20px rgba(205, 255, 0, 0.8); }
+}
+
+.scratch-section {
+    margin-top: 40px;
+}
+
+.scratch-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+.scratch-canvas {
+    display: block;
+    margin: 0 auto;
+    border: 2px dashed var(--primary-green);
+    border-radius: 8px;
+    cursor: pointer;
+    background: #1a1a1a;
+}
+
+.scratch-reveal-text {
+    margin-top: 15px;
+    color: var(--primary-green);
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(205, 255, 0, 0.5);
+    animation: pulse-glow 2s ease-in-out infinite;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.godot-logo-img { width: 150px; margin-bottom: 15px; }
+.godot-link-btn {
+    display: inline-block; margin-top: 25px; padding: 10px 25px;
+    border: 2px solid var(--primary-green); color: var(--primary-green);
+    text-decoration: none; font-family: var(--font-head); transition: 0.2s;
+}
+.godot-link-btn:hover { background: var(--primary-green); color: #000; box-shadow: 0 0 20px var(--primary-green); }
+
+.founder-card { border: none; }
+.tech-badge {
+    padding: 5px 15px; border: none; color: var(--primary-green);
+    font-family: var(--font-head); font-size: 0.7rem; margin: 5px; display: inline-block;
+}
+
+/* Donation */
+.donation-container { text-align: center; padding: 100px 20px; }
+.upi-button {
+    display: inline-block; padding: 20px 50px; border: 2px solid var(--primary-green);
+    color: var(--primary-green); font-family: var(--font-head); text-decoration: none;
+    font-size: 1.2rem; transition: 0.2s;
+}
+.upi-button:hover { background: var(--primary-green); color: #000; box-shadow: 0 0 30px var(--primary-green); }
+.disclaimer { color: #555; font-size: 0.8rem; margin-top: 15px; }
+
+footer { text-align: center; padding: 40px; color: #333; font-family: var(--font-head); font-size: 0.7rem; }
+
+.social-links { margin-bottom: 20px; display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; }
+
+.social-link { 
+    color: var(--primary-green); 
+    text-decoration: none; 
+    font-family: var(--font-head);
+    font-weight: 600;
+    transition: 0.3s;
+    border-bottom: 2px solid transparent;
+}
+
+.social-link:hover { 
+    color: var(--secondary-green);
+    border-bottom: 2px solid var(--primary-green);
+    box-shadow: 0 0 15px var(--primary-green);
+}
+
+.social-icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    transition: 0.3s all ease;
+}
+
+.social-icon svg {
+    width: 100%;
+    height: 100%;
+    color: var(--primary-green);
+    transition: 0.3s all ease;
+}
+
+.social-icon:hover {
+    transform: scale(1.15);
+}
+
+.social-icon:hover svg {
+    color: var(--secondary-green);
+    filter: drop-shadow(0 0 10px #cdff00);
+}
+
+/* Scroll Animations */
+.reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.reveal.active { opacity: 1; transform: translateY(0); }
+
+/* Enhanced hover animations for cards */
+.glass-card, .engine-card, .game-description-card, .founder-card {
+    transition: all 0.4s ease;
+}
+
+.glass-card:hover, .engine-card:hover, .game-description-card:hover, .founder-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(205, 255, 0, 0.2);
+}
+
+/* Button animations */
+.cta-btn {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cta-btn:hover { 
+    transform: scale(1.08) translateY(-3px); 
+    box-shadow: 0 0 50px var(--primary-green);
+}
+
+/* Enhanced nav button */
+.nav-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Smooth section transitions */
+.section-title {
+    animation: slide-in-down 0.6s ease-out;
+}
+
+@keyframes slide-in-down {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Floating animation for cards */
+@keyframes float-up {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+}
+
+.glass-card {
+    animation: float-up 4s ease-in-out infinite;
+}
+
+.engine-card {
+    animation: float-up 4.5s ease-in-out infinite;
+}
+
+.game-description-card {
+    animation: float-up 5s ease-in-out infinite;
+}
+
+/* Typing Animation */
+.typing-text {
+    overflow: hidden;
+    border-right: 3px solid var(--primary-green);
+    white-space: nowrap;
+    animation: typing 0.6s steps(17, end), blink 0.7s step-end infinite;
+    display: inline-block;
+}
+
+.typing-animation {
+    overflow: visible;
+    border-right: none;
+    white-space: normal;
+    display: inline-block;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 17ch; }
+}
+
+@keyframes typing-hero {
+    from { width: 0; }
+    to { width: 16ch; }
+}
+
+@keyframes blink {
+    from, to { border-color: var(--primary-green); }
+    50% { border-color: transparent; }
+}
+
+@keyframes blink-cursor {
+    from, to { border-color: var(--primary-green); }
+    50% { border-color: transparent; }
+}
+
+@keyframes rotate-float {
+    0%, 100% { transform: rotateY(0deg) translateY(0px); }
+    50% { transform: rotateY(180deg) translateY(-10px); }
+}
+    </style>
+</head>
+<body>
+
+    <div class="cyber-grid"></div>
+
+    <nav>
+        <div class="logo typing-text" id="typing-logo">BULKY HIT STUDIO</div>
+        <button class="nav-btn" id="nav-support-btn">Support the Vision</button>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content reveal">
+            <h1 class="gradient-text typing-animation" id="hero-typing">BULKY HIT STUDIO</h1>
+            <p class="subtitle">Revolutionizing indie game development</p>
+            <div class="hero-buttons">
+                <button class="cta-btn" id="hero-cta">SUPPORT DEVELOPMENT</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="glass-card reveal">
+            <h2 class="section-title">Project Overview</h2>
+            <p class="vision-statement">
+                Our vision is to make our indie game <strong>popular all over the world</strong>. We are blending mathematical precision with creative storytelling to build an experience that transcends borders.
+            </p>
+            <div class="vision-bar">
+                <span>GLOBAL REACH</span>
+                <span>INNOVATIVE DESIGN</span>
+                <span>COMMUNITY DRIVEN</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="engine-card reveal">
+            <div class="engine-header">
+                <img src="https://godotengine.org/assets/logo.svg" alt="Godot Logo" class="godot-logo-img">
+                <h2 style="color: #478cbf;">GODOT ENGINE</h2>
+            </div>
+            <p>
+                We utilize the <strong>Godot Engine</strong> to bring our global vision to life. Godot's high-performance 2D and 3D capabilities and open-source nature allow us to push the boundaries of what a student-led studio can achieve.
+            </p>
+            <a href="https://godotengine.org" target="_blank" class="godot-link-btn">LEARN ABOUT GODOT</a>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="game-description-card reveal">
+            <h2 class="section-title">The Game</h2>
+            <div class="game-narrative">
+                <p class="narrative-line">Places the player in charge of controlling access to a forbidden site using strict procedural checks.</p>
+                <p class="narrative-line">Every decision silently shapes future events, turning small errors into long-term threats.</p>
+                <p class="narrative-line">Technology, rules, and human behavior begin to conflict as reality becomes unstable.</p>
+                <p class="narrative-line secret-text">Survival depends on discipline, attention, and choices that cannot be undone.</p>
+                <div class="scratch-section">
+                    <p class="scratch-label">Scratch to reveal secret...</p>
+                    <canvas id="scratchCanvas" class="scratch-canvas" width="300" height="120"></canvas>
+                    <p class="scratch-reveal-text">Rest is Secret</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="founder-card reveal" id="tilt-card">
+            <div class="founder-info">
+                <h2>Founder And CEO<br>Anmol Srivastava</h2>
+                <span class="founder-role">Founder & Lead Dev</span>
+                <p class="bio-text">
+                    A student of <strong>Mathematics</strong> applying complex logic to the Godot Engine. Developing world-class games from the ground up.
+                </p>
+                <div class="badge-container">
+                    <span class="tech-badge">Mathematics</span>
+                    <span class="tech-badge">GDScript</span>
+                    <span class="tech-badge">UI/UX</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="donate" class="donation-container reveal">
+        <h2 class="gradient-text">FUEL OUR GLOBAL AMBITION</h2>
+        <p class="donate-sub">Contribute directly via UPI</p>
+        <a href="https://www.upi.me/pay?pa=anmolsri@fam&tn=ThanksForSupporting Us" class="upi-button">
+            SEND SUPPORT VIA UPI
+        </a>
+        <p class="disclaimer">(Redirects to your payment app on mobile)</p>
+    </section>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://instagram.com" target="_blank" class="social-icon" title="Instagram">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.015-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1 1 12.324 0 6.162 6.162 0 0 1-12.324 0zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm4.965-10.322a1.44 1.44 0 1 1 2.881.001 1.44 1.44 0 0 1-2.881-.001z"/></svg>
+            </a>
+            <a href="https://twitter.com" target="_blank" class="social-icon" title="Twitter">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.6l-5.165-6.75-5.9 6.75h-3.31l7.73-8.835L2.56 2.25h6.772l4.681 6.18 5.431-6.18zM17.7 20.005h1.813L6.374 4.099H4.46z"/></svg>
+            </a>
+            <a href="https://youtube.com" target="_blank" class="social-icon" title="YouTube">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+            <a href="https://discord.com" target="_blank" class="social-icon" title="Discord">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.444.864-.607 1.25a18.27 18.27 0 0 0-5.487 0c-.163-.386-.395-.875-.607-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 0 0-.042-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.076.076 0 0 0-.041.107c.352.699.764 1.365 1.225 1.994a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.057c.5-4.718-.838-8.813-3.551-12.542a.06.06 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-.965-2.157-2.156 0-1.193.974-2.157 2.157-2.157 1.193 0 2.156.964 2.156 2.157 0 1.19-.963 2.156-2.156 2.156zm7.975 0c-1.183 0-2.157-.965-2.157-2.156 0-1.193.974-2.157 2.157-2.157 1.193 0 2.156.964 2.156 2.157 0 1.19-.962 2.156-2.156 2.156z"/></svg>
+            </a>
+        </div>
+        <p>&copy; 2025 BULKY HIT STUDIO | POWERED BY GODOT</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
