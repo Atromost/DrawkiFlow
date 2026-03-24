@@ -114,6 +114,25 @@ function createNode(type, x, y, data = {}) {
   return node;
 }
 
+// ===== URL EMBED PARSER =====
+function getEmbedUrl(url) {
+  if (!url) return '';
+  // YouTube
+  const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+  // Spotify
+  const spotMatch = url.match(/spotify\.com\/(track|album|playlist|episode|show)\/([a-zA-Z0-9]+)/);
+  if (spotMatch) return `https://open.spotify.com/embed/${spotMatch[1]}/${spotMatch[2]}`;
+  // Vimeo
+  const vimMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (vimMatch) return `https://player.vimeo.com/video/${vimMatch[1]}`;
+  // SoundCloud
+  const scMatch = url.match(/soundcloud\.com\/.+/);
+  if (scMatch) return `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}`;
+  // Default fallback
+  return url;
+}
+
 function renderNode(node) {
   let el = document.getElementById(node.id);
   if (!el) {
@@ -237,12 +256,13 @@ function buildNodeHTML(node) {
       </div>
     `;
   } else if (node.type === 'embed') {
+    const finalUrl = getEmbedUrl(node.embedUrl);
     body = `
       <div class="embed-input-area">
         <input class="embed-url-input" placeholder="Paste URL..." value="${escHtml(node.embedUrl || '')}" data-field="embedUrl" style="user-select:text">
         <button class="embed-go-btn" data-action="embed-go">Go</button>
       </div>
-      ${node.embedUrl ? `<iframe src="${node.embedUrl}" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>` : ''}
+      ${finalUrl ? `<iframe src="${finalUrl}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>` : ''}
     `;
   }
 
@@ -255,7 +275,6 @@ function attachNodeEvents(el, node) {
   if (header) {
     header.addEventListener('mousedown', e => {
       if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
-      if (state.tool === 'connect') return;
       e.preventDefault();
       e.stopPropagation();
       startDrag(e, node);
@@ -266,7 +285,7 @@ function attachNodeEvents(el, node) {
     const htxt = el.querySelector('.heading-text');
     if (htxt) {
       el.addEventListener('mousedown', e => {
-        if (e.target === htxt || state.tool === 'connect') return;
+        if (e.target === htxt) return;
         e.preventDefault();
         startDrag(e, node);
       });
@@ -277,7 +296,6 @@ function attachNodeEvents(el, node) {
   el.addEventListener('mousedown', e => {
     if (e.button === 2) return;
     if (e.target.closest('.node-action-btn') || e.target.closest('.connect-dot') || e.target.closest('.resize-handle')) return;
-    if (state.tool === 'connect') return;
     if (!e.shiftKey) {
       if (!state.selectedNodes.has(node.id)) {
         clearSelection();
@@ -294,7 +312,7 @@ function attachNodeEvents(el, node) {
     dot.addEventListener('mousedown', e => {
       e.stopPropagation();
       e.preventDefault();
-      if (state.tool !== 'connect' && state.tool !== 'select') return;
+      // Allow starting a connection regardless of active tool
       state.connecting = { fromId: node.id, fromDir: dot.dataset.dir };
     });
   });
@@ -563,34 +581,36 @@ function renderConnections() {
   ctx.clearRect(0, 0, connCanvas.width, connCanvas.height);
 
   state.connections.forEach(conn => {
-    const fromNode = state.nodes.find(n => n.id === conn.fromId);
-    const toNode = state.nodes.find(n => n.id === conn.toId);
-    if (!fromNode || !toNode) return;
+    try {
+      const fromNode = state.nodes.find(n => n.id === conn.fromId);
+      const toNode = state.nodes.find(n => n.id === conn.toId);
+      if (!fromNode || !toNode) return;
 
-    const fromEl = document.getElementById(conn.fromId);
-    const toEl = document.getElementById(conn.toId);
-    if (!fromEl || !toEl) return;
+      const fromEl = document.getElementById(conn.fromId);
+      const toEl = document.getElementById(conn.toId);
+      if (!fromEl || !toEl) return;
 
-    const fp = getDotScreenPos(fromNode, conn.fromDir);
-    const tp = getDotScreenPos(toNode, conn.toDir);
+      const fp = getDotScreenPos(fromNode, conn.fromDir);
+      const tp = getDotScreenPos(toNode, conn.toDir);
 
-    if (!fp || !tp) return;
+      if (!fp || !tp) return;
 
-    ctx.beginPath();
-    ctx.strokeStyle = conn.selected ? 'rgba(205,255,0,0.9)' : 'rgba(205,255,0,0.35)';
-    ctx.lineWidth = conn.selected ? 2.5 : 1.5;
-    ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.strokeStyle = conn.selected ? 'rgba(205,255,0,0.9)' : 'rgba(205,255,0,0.35)';
+      ctx.lineWidth = conn.selected ? 2.5 : 1.5;
+      ctx.setLineDash([]);
 
-    // Bezier curve
-    const dx = tp.x - fp.x, dy = tp.y - fp.y;
-    const cx1 = fp.x + dx * 0.5, cy1 = fp.y;
-    const cx2 = tp.x - dx * 0.5, cy2 = tp.y;
-    ctx.moveTo(fp.x - r.left, fp.y - r.top);
-    ctx.bezierCurveTo(cx1 - r.left, cy1 - r.top, cx2 - r.left, cy2 - r.top, tp.x - r.left, tp.y - r.top);
-    ctx.stroke();
+      // Bezier curve
+      const dx = tp.x - fp.x, dy = tp.y - fp.y;
+      const cx1 = fp.x + dx * 0.5, cy1 = fp.y;
+      const cx2 = tp.x - dx * 0.5, cy2 = tp.y;
+      ctx.moveTo(fp.x - r.left, fp.y - r.top);
+      ctx.bezierCurveTo(cx1 - r.left, cy1 - r.top, cx2 - r.left, cy2 - r.top, tp.x - r.left, tp.y - r.top);
+      ctx.stroke();
 
-    // Arrow
-    drawArrow(ctx, { x: cx2 - r.left, y: cy2 - r.top }, { x: tp.x - r.left, y: tp.y - r.top }, conn.selected);
+      // Arrow
+      drawArrow(ctx, { x: cx2 - r.left, y: cy2 - r.top }, { x: tp.x - r.left, y: tp.y - r.top }, conn.selected);
+    } catch(e) { console.warn("Connection rendering skipped for a node.", e); }
   });
 
   // Preview line while connecting
@@ -794,20 +814,44 @@ function setupEvents() {
     }
 
     if (state.connecting) {
-      // Find target node
       const targetNode = getNodeUnderMouse(e.clientX, e.clientY);
       if (targetNode && targetNode.id !== state.connecting.fromId) {
+        
+        let toDir = 'top';
+        if (e.target && e.target.classList && e.target.classList.contains('connect-dot')) {
+          // If dropped exactly on a connection dot, use that dot
+          toDir = e.target.dataset.dir;
+        } else {
+          // Automatically calculate nearest dot on target node
+          const nodeEl = document.getElementById(targetNode.id);
+          if (nodeEl) {
+            const rect = nodeEl.getBoundingClientRect();
+            const cx = e.clientX, cy = e.clientY;
+            const dists = [
+              { dir: 'top', d: Math.hypot(cx - (rect.left + rect.width/2), cy - rect.top) },
+              { dir: 'bottom', d: Math.hypot(cx - (rect.left + rect.width/2), cy - rect.bottom) },
+              { dir: 'left', d: Math.hypot(cx - rect.left, cy - (rect.top + rect.height/2)) },
+              { dir: 'right', d: Math.hypot(cx - rect.right, cy - (rect.top + rect.height/2)) }
+            ];
+            dists.sort((a,b) => a.d - b.d);
+            toDir = dists[0].dir;
+          }
+        }
+
         const conn = {
           id: 'conn_' + (++state.connCounter),
           fromId: state.connecting.fromId,
           fromDir: state.connecting.fromDir,
           toId: targetNode.id,
-          toDir: 'top'
+          toDir: toDir
         };
         state.connections.push(conn);
         updateStatus();
         autoSave();
         showToast('Nodes connected');
+        
+        // Auto-switch back to select tool for better UX flow
+        setTool('select');
       }
       state.connecting = null;
       renderConnections();
@@ -841,20 +885,42 @@ function setupEvents() {
 
   // Paste global
   document.addEventListener('paste', e => {
-    const items = e.clipboardData.items;
-    for (const item of items) {
+    const clipboardData = e.clipboardData || window.clipboardData;
+    if (!clipboardData) return;
+    
+    const items = clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
       if (item.type.startsWith('image/')) {
+        e.preventDefault();
         const file = item.getAsFile();
-        const cp = screenToCanvas(wrapper.getBoundingClientRect().width / 2, wrapper.getBoundingClientRect().height / 2);
-        const node = createNode('image', cp.x, cp.y, { title: 'Pasted Image' });
-        loadImageFile(file, node);
+        
+        let targetNode = null;
+        if (state.selectedNodes.size === 1) {
+          const id = [...state.selectedNodes][0];
+          const selNode = state.nodes.find(n => n.id === id);
+          if (selNode && selNode.type === 'image') targetNode = selNode;
+        }
+
+        if (targetNode) {
+          loadImageFile(file, targetNode);
+        } else {
+          // Paste in center of viewport
+          const r = wrapper.getBoundingClientRect();
+          const cp = screenToCanvas(r.left + r.width / 2, r.top + r.height / 2);
+          const offset = (Math.random() * 40) - 20; // prevent exact overlap
+          const node = createNode('image', cp.x + offset, cp.y + offset, { title: 'Pasted Image' });
+          loadImageFile(file, node);
+        }
         return;
       }
     }
-    const text = e.clipboardData.getData('text');
+    
+    const text = clipboardData.getData('text');
     if (text && document.activeElement === document.body) {
-      const cp = screenToCanvas(wrapper.getBoundingClientRect().width / 2, wrapper.getBoundingClientRect().height / 2);
-      createNode('note', cp.x, cp.y, { title: 'Pasted', content: text });
+      const r = wrapper.getBoundingClientRect();
+      const cp = screenToCanvas(r.left + r.width / 2, r.top + r.height / 2);
+      createNode('note', cp.x, cp.y, { title: 'Pasted Text', content: escHtml(text).replace(/\n/g, '<br>') });
     }
   });
 }
@@ -1099,27 +1165,27 @@ function setupKeyboard() {
       case 'd': case 'D': setTool('draw'); break;
       case 'n': case 'N': {
         const r = wrapper.getBoundingClientRect();
-        const cp = screenToCanvas(r.width / 2, r.height / 2);
+        const cp = screenToCanvas(r.left + r.width / 2, r.top + r.height / 2);
         createNode('note', cp.x, cp.y); break;
       }
       case 't': case 'T': {
         const r = wrapper.getBoundingClientRect();
-        const cp = screenToCanvas(r.width / 2, r.height / 2);
+        const cp = screenToCanvas(r.left + r.width / 2, r.top + r.height / 2);
         createNode('todo', cp.x, cp.y); break;
       }
       case 's': case 'S': {
         const r = wrapper.getBoundingClientRect();
-        const cp = screenToCanvas(r.width / 2, r.height / 2);
+        const cp = screenToCanvas(r.left + r.width / 2, r.top + r.height / 2);
         createNode('sticky', cp.x, cp.y); break;
       }
       case 'i': case 'I': {
         const r = wrapper.getBoundingClientRect();
-        const cp = screenToCanvas(r.width / 2, r.height / 2);
+        const cp = screenToCanvas(r.left + r.width / 2, r.top + r.height / 2);
         createNode('image', cp.x, cp.y); break;
       }
       case 'e': case 'E': {
         const r = wrapper.getBoundingClientRect();
-        const cp = screenToCanvas(r.width / 2, r.height / 2);
+        const cp = screenToCanvas(r.left + r.width / 2, r.top + r.height / 2);
         createNode('embed', cp.x, cp.y); break;
       }
       case '0': state.zoom = 1; state.panX = 0; state.panY = 0; updateTransform(); break;
