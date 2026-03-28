@@ -4,537 +4,300 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Creative Suite</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --flowly-accent: #c8f135;
-    --flowly-bg: #0a0a0a;
-    --drawki-accent: #7c6ff7;
-    --drawki-bg: #12111e;
+    --flowly: #c8f135;
+    --drawki: #7c6ff7;
     --drawki-pink: #e8547a;
-    --drawki-yellow: #f0c040;
+    --tempo: #ff6b2b;
+    --tempo-gold: #ffd166;
+    --bg: #080810;
+    --glass: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.08);
   }
 
-  html, body {
-    width: 100%; height: 100%;
-    overflow: hidden;
-  }
+  html, body { width:100%; height:100%; overflow:hidden; }
 
   body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #080808;
-    position: relative;
     cursor: none;
     position: relative;
   }
 
-  /* CUSTOM CURSOR */
+  /* ── CUSTOM CURSOR ── */
   .cursor {
-    position: fixed;
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: white;
-    pointer-events: none;
-    z-index: 9999;
-    mix-blend-mode: difference;
-    transition: transform 0.15s ease;
+    position:fixed; width:10px; height:10px;
+    border-radius:50%; background:white;
+    pointer-events:none; z-index:9999;
+    mix-blend-mode:difference;
   }
   .cursor-ring {
-    position: fixed;
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.4);
-    pointer-events: none;
-    z-index: 9998;
-    transition: all 0.25s ease;
+    position:fixed; width:32px; height:32px;
+    border-radius:50%; border:1px solid rgba(255,255,255,0.35);
+    pointer-events:none; z-index:9998;
+    transition: all 0.22s ease;
   }
 
-  /* BACKGROUND SPLIT */
-  .bg-left {
-    position: fixed;
-    left: 0; top: 0;
-    width: 50%; height: 100%;
-    background: var(--flowly-bg);
-    z-index: 0;
+  /* ── AURORA BG ── */
+  .aurora {
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    overflow:hidden;
   }
-  .bg-right {
-    position: fixed;
-    right: 0; top: 0;
-    width: 50%; height: 100%;
-    background: var(--drawki-bg);
-    z-index: 0;
+  .aurora-blob {
+    position:absolute; border-radius:50%; filter:blur(80px);
+    opacity:0.12; animation:drift ease-in-out infinite alternate;
+  }
+  .a1 { width:600px;height:500px; background:var(--flowly); top:-100px;left:-150px; animation-duration:14s; }
+  .a2 { width:500px;height:400px; background:var(--drawki); bottom:-80px;right:-100px; animation-duration:18s; animation-delay:-6s; }
+  .a3 { width:350px;height:350px; background:var(--tempo); top:50%;left:50%; transform:translate(-50%,-50%); animation-duration:10s; animation-delay:-3s; opacity:0.07; }
+  .a4 { width:300px;height:300px; background:var(--tempo-gold); bottom:10%;right:30%; animation-duration:22s; animation-delay:-9s; opacity:0.06; }
+
+  @keyframes drift {
+    from { transform: translate(0,0) scale(1); }
+    to   { transform: translate(40px, 30px) scale(1.08); }
   }
 
-  /* GRID OVERLAYS */
-  .grid-left {
-    position: fixed;
-    left: 0; top: 0;
-    width: 50%; height: 100%;
+  /* ── GRID ── */
+  .grid {
+    position:fixed; inset:0; z-index:1; pointer-events:none;
     background-image:
-      linear-gradient(rgba(200,241,53,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(200,241,53,0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
-    z-index: 1;
-  }
-  .grid-right {
-    position: fixed;
-    right: 0; top: 0;
-    width: 50%; height: 100%;
-    background-image:
-      radial-gradient(rgba(124,111,247,0.08) 1px, transparent 1px);
-    background-size: 24px 24px;
-    z-index: 1;
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
   }
 
-  /* FLOATING PARTICLES */
-  .particles-left { position: fixed; left: 0; top: 0; width: 50%; height: 100%; z-index: 2; pointer-events: none; overflow: hidden; }
-  .particles-right { position: fixed; right: 0; top: 0; width: 50%; height: 100%; z-index: 2; pointer-events: none; overflow: hidden; }
+  /* ── NOISE ── */
+  body::after {
+    content:''; position:fixed; inset:0; z-index:2; pointer-events:none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity:0.5;
+  }
 
+  /* ── FLOATING PARTICLES ── */
+  .particles { position:fixed; inset:0; z-index:3; pointer-events:none; overflow:hidden; }
   .p-dot {
-    position: absolute;
-    border-radius: 50%;
+    position:absolute; border-radius:50%;
     animation: floatUp linear infinite;
   }
-  .p-dot.green { background: var(--flowly-accent); box-shadow: 0 0 8px var(--flowly-accent); }
-  .p-dot.purple { background: var(--drawki-accent); box-shadow: 0 0 8px var(--drawki-accent); }
-  .p-dot.pink { background: var(--drawki-pink); box-shadow: 0 0 8px var(--drawki-pink); }
-
   @keyframes floatUp {
-    0% { transform: translateY(0) scale(1); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 0.6; }
-    100% { transform: translateY(-110vh) scale(0.5); opacity: 0; }
+    0%   { transform:translateY(0) scale(1); opacity:0; }
+    10%  { opacity:1; }
+    90%  { opacity:0.5; }
+    100% { transform:translateY(-105vh) scale(0.4); opacity:0; }
   }
 
-  /* NOISE TEXTURE */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 10;
-    opacity: 0.4;
-  }
+  /* ── CORNER MARKS ── */
+  .corner { position:fixed; z-index:20; width:28px; height:28px; }
+  .corner svg line { stroke:rgba(255,255,255,0.12); stroke-width:1; }
+  .corner-tl { top:18px; left:18px; }
+  .corner-tr { top:18px; right:18px; transform:rotate(90deg); }
+  .corner-bl { bottom:18px; left:18px; transform:rotate(-90deg); }
+  .corner-br { bottom:18px; right:18px; transform:rotate(180deg); }
 
-  /* DIVIDER LINE */
-  .divider {
-    position: fixed;
-    left: 50%;
-    top: 0; bottom: 0;
-    width: 1px;
-    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.15) 20%, rgba(255,255,255,0.15) 80%, transparent);
-    z-index: 5;
-    transform: translateX(-0.5px);
+  /* ── SIDE LABELS ── */
+  .side-label {
+    position:fixed; z-index:20;
+    font-family:'JetBrains Mono', monospace; font-size:8px;
+    letter-spacing:0.3em; writing-mode:vertical-rl;
+    text-orientation:mixed; opacity:0.2;
+    top:50%; transform:translateY(-50%);
   }
-  .divider::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: white;
-    box-shadow: 0 0 16px rgba(255,255,255,0.8);
-  }
+  .side-label.left { left:22px; color:var(--flowly); transform:translateY(-50%) rotate(180deg); }
+  .side-label.right { right:22px; color:var(--tempo); }
 
-  /* MAIN CONTENT */
+  /* ── GITHUB BUTTON ── */
+  .github-btn {
+    position:fixed; top:18px; right:18px; z-index:50;
+    display:flex; align-items:center; gap:8px;
+    padding:7px 14px 7px 11px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid var(--border); border-radius:999px;
+    color:rgba(255,255,255,0.6);
+    font-family:'Outfit', sans-serif; font-size:12px; font-weight:500;
+    text-decoration:none; cursor:pointer;
+    backdrop-filter:blur(12px);
+    transition:all 0.3s ease;
+    animation:slideDown 0.6s 0.5s both;
+  }
+  .github-btn:hover {
+    background:rgba(255,255,255,0.1);
+    border-color:rgba(255,255,255,0.25);
+    color:white; transform:translateY(-2px);
+    box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  }
+  .gh-badge {
+    font-family:'JetBrains Mono',monospace; font-size:9px;
+    color:var(--flowly); background:rgba(200,241,53,0.08);
+    border:1px solid rgba(200,241,53,0.2);
+    border-radius:999px; padding:2px 7px;
+  }
+  .github-btn:hover .gh-badge { background:rgba(200,241,53,0.15); border-color:rgba(200,241,53,0.4); }
+
+  /* ── MAIN WRAPPER ── */
   .wrapper {
-    position: relative;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
+    position:relative; z-index:20;
+    display:flex; flex-direction:column;
+    align-items:center; gap:14px;
+    animation:riseUp 0.9s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  @keyframes riseUp {
+    from { opacity:0; transform:translateY(30px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes slideDown {
+    from { opacity:0; transform:translateY(-12px); }
+    to   { opacity:1; transform:translateY(0); }
   }
 
-  .headline {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: clamp(11px, 1.4vw, 13px);
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
-    margin-bottom: 8px;
-    text-align: center;
+  /* ── TITLE ── */
+  .eyebrow {
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px; letter-spacing:0.4em;
+    text-transform:uppercase; color:rgba(255,255,255,0.28);
+    text-align:center;
+  }
+
+  .title-row {
+    display:flex; align-items:center; gap:14px;
+    margin:2px 0 2px;
+  }
+  .title-word {
+    font-family:'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 5.5vw, 64px);
+    line-height:1;
+    animation: letterPop 0.6s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .t-flowly { color:var(--flowly); animation-delay:0.1s; }
+  .t-sep    { color:rgba(255,255,255,0.12); font-size:clamp(22px,3vw,36px); animation-delay:0.2s; }
+  .t-drawki { color:var(--drawki); animation-delay:0.3s; }
+  .t-sep2   { color:rgba(255,255,255,0.12); font-size:clamp(22px,3vw,36px); animation-delay:0.35s; }
+  .t-tempo  { color:var(--tempo); animation-delay:0.4s; }
+  @keyframes letterPop {
+    from { opacity:0; transform:translateY(18px) skewX(-5deg); }
+    to   { opacity:1; transform:translateY(0) skewX(0); }
   }
 
   .subtitle {
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    font-size: clamp(12px, 1.3vw, 14px);
-    color: rgba(255,255,255,0.2);
-    text-align: center;
-    letter-spacing: 0.05em;
-    margin-top: -8px;
-    margin-bottom: 16px;
+    font-size:12px; font-weight:300;
+    color:rgba(255,255,255,0.2); letter-spacing:0.06em;
+    text-align:center; margin-top:-4px; margin-bottom:10px;
   }
 
+  /* ── BUTTON ROW ── */
   .buttons-row {
-    display: flex;
-    gap: 32px;
-    align-items: center;
+    display:flex; align-items:center; gap:18px;
+    flex-wrap:wrap; justify-content:center;
   }
 
-  /* ---- FLOWLY BUTTON ---- */
-  .btn-flowly {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 18px 32px;
-    background: transparent;
-    border: 1.5px solid var(--flowly-accent);
-    color: var(--flowly-accent);
-    font-family: 'Space Mono', monospace;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    text-decoration: none;
-    letter-spacing: 0.02em;
-    overflow: hidden;
-    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
-    transition: color 0.3s ease;
-  }
-  .btn-flowly::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--flowly-accent);
-    transform: translateX(-110%);
-    transition: transform 0.4s cubic-bezier(0.77, 0, 0.18, 1);
-    z-index: -1;
-  }
-  .btn-flowly:hover::before { transform: translateX(0); }
-  .btn-flowly:hover { color: #0a0a0a; }
-
-  /* glow ring */
-  .btn-flowly::after {
-    content: '';
-    position: absolute;
-    inset: -6px;
-    border: 1px solid rgba(200,241,53,0.2);
-    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .btn-flowly:hover::after { opacity: 1; }
-
-  /* scan-line animation on hover */
-  .btn-flowly .scanline {
-    position: absolute;
-    left: 0; right: 0;
-    height: 2px;
-    background: rgba(200,241,53,0.6);
-    top: -2px;
-    animation: none;
-  }
-  .btn-flowly:hover .scanline {
-    animation: scanDown 0.5s linear forwards;
-  }
-  @keyframes scanDown {
-    0% { top: -2px; opacity: 1; }
-    100% { top: 100%; opacity: 0; }
-  }
-
-  .btn-flowly .icon { flex-shrink: 0; transition: transform 0.3s; }
-  .btn-flowly:hover .icon { transform: scale(1.15) rotate(5deg); }
-
-  .node-tag {
-    position: absolute;
-    top: -9px; right: 14px;
-    font-family: 'Space Mono', monospace;
-    font-size: 8px;
-    color: var(--flowly-accent);
-    background: var(--flowly-bg);
-    padding: 1px 5px;
-    border: 1px solid var(--flowly-accent);
-    letter-spacing: 0.1em;
-    transition: background 0.3s, color 0.3s;
-  }
-  .btn-flowly:hover .node-tag {
-    background: var(--flowly-accent);
-    color: var(--flowly-bg);
-  }
-
-  /* ---- OR ---- */
   .or-sep {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    color: rgba(255,255,255,0.18);
-    letter-spacing: 0.2em;
-    position: relative;
+    font-family:'JetBrains Mono',monospace; font-size:9px;
+    color:rgba(255,255,255,0.15); letter-spacing:0.2em;
+    padding:0 4px;
   }
-  .or-sep::before, .or-sep::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 20px; height: 1px;
-    background: rgba(255,255,255,0.12);
-  }
-  .or-sep::before { right: calc(100% + 8px); }
-  .or-sep::after { left: calc(100% + 8px); }
 
-  /* ---- DRAWKI BUTTON ---- */
+  /* shared button base */
+  .btn {
+    position:relative;
+    display:flex; align-items:center; gap:11px;
+    padding:16px 28px;
+    font-family:'Outfit', sans-serif; font-size:14px; font-weight:600;
+    text-decoration:none; cursor:pointer;
+    overflow:hidden; transition:all 0.35s ease;
+    letter-spacing:0.03em;
+  }
+  .btn .icon { flex-shrink:0; transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+  .btn:hover .icon { transform:scale(1.2) rotate(8deg); }
+  .btn .fill {
+    position:absolute; inset:0; z-index:-1;
+    transform:translateY(101%);
+    transition:transform 0.4s cubic-bezier(0.77,0,0.18,1);
+  }
+  .btn:hover .fill { transform:translateY(0); }
+
+  /* ── FLOWLY BUTTON ── */
+  .btn-flowly {
+    border:1.5px solid var(--flowly); color:var(--flowly);
+    clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  }
+  .btn-flowly .fill { background:var(--flowly); }
+  .btn-flowly:hover { color:#080810; }
+  .btn-flowly .chip {
+    position:absolute; top:-8px; right:12px;
+    font-family:'JetBrains Mono',monospace; font-size:7px;
+    letter-spacing:0.1em; color:var(--flowly);
+    background:var(--bg); border:1px solid var(--flowly);
+    padding:1px 5px; transition:all 0.3s;
+  }
+  .btn-flowly:hover .chip { background:var(--flowly); color:#080810; }
+
+  /* ── DRAWKI BUTTON ── */
   .btn-drawki {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 18px 32px;
-    background: transparent;
-    border: 1.5px solid var(--drawki-accent);
-    color: #e2e0ff;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    letter-spacing: 0.02em;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: color 0.3s ease, border-color 0.3s;
+    border:1.5px solid var(--drawki); color:#d8d4ff;
+    border-radius:10px;
   }
-  .btn-drawki::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, var(--drawki-accent), var(--drawki-pink));
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: -1;
+  .btn-drawki .fill { background:linear-gradient(135deg, var(--drawki), var(--drawki-pink)); }
+  .btn-drawki:hover { color:white; border-color:transparent; }
+  .btn-drawki .dot-a, .btn-drawki .dot-b {
+    position:absolute; border-radius:50%;
+    font-size:9px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
   }
-  .btn-drawki:hover::before { opacity: 1; }
-  .btn-drawki:hover { color: white; border-color: transparent; }
+  .btn-drawki .dot-a { top:-9px; left:12px; width:18px;height:18px; background:#ffd166; color:#1a0d00; }
+  .btn-drawki .dot-b { top:-7px; right:-3px; width:13px;height:13px; background:var(--drawki-pink); color:#fff; font-size:7px; }
+  .btn-drawki:hover .dot-a { transform:scale(1.4) rotate(-15deg); }
+  .btn-drawki:hover .dot-b { transform:scale(1.4) rotate(15deg); }
 
-  /* bubble pop */
-  .btn-drawki .bubble {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.15);
-    transform: scale(0);
-    pointer-events: none;
-    animation: bubblePop 0.6s ease-out forwards;
+  /* ── TEMPO BUTTON ── */
+  .btn-tempo {
+    border:1.5px solid var(--tempo); color:var(--tempo);
+    clip-path:polygon(0% 8px, 8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%);
   }
-  @keyframes bubblePop {
-    0% { transform: scale(0); opacity: 1; }
-    100% { transform: scale(4); opacity: 0; }
+  .btn-tempo .fill { background:linear-gradient(135deg, var(--tempo), var(--tempo-gold)); }
+  .btn-tempo:hover { color:#0a0800; }
+  .btn-tempo .new-tag {
+    position:absolute; top:-9px; left:12px;
+    font-family:'JetBrains Mono',monospace; font-size:7px;
+    letter-spacing:0.12em; padding:1px 6px;
+    border-radius:999px;
+    background:var(--tempo); color:#fff;
+    transition:all 0.3s;
+    animation:pulse 2s ease-in-out infinite;
   }
+  @keyframes pulse {
+    0%,100% { box-shadow:0 0 0 0 rgba(255,107,43,0.4); }
+    50%      { box-shadow:0 0 0 5px rgba(255,107,43,0); }
+  }
+  .btn-tempo:hover .new-tag { background:#0a0800; color:var(--tempo); }
 
-  .btn-drawki .icon { flex-shrink: 0; transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); }
-  .btn-drawki:hover .icon { transform: rotate(15deg) scale(1.2); }
-
-  /* floating shapes around drawki btn */
-  .drawki-shapes {
-    position: absolute;
-    inset: -40px;
-    pointer-events: none;
-    z-index: -1;
+  /* clock hand spin on tempo icon */
+  .btn-tempo .hand {
+    transform-origin: 11px 11px;
+    transition:transform 0.4s;
   }
-  .d-shape {
-    position: absolute;
-    opacity: 0;
-    transition: opacity 0.3s;
+  .btn-tempo:hover .hand { transform:rotate(90deg); }
+  .btn-tempo .hand2 {
+    transform-origin: 11px 11px;
+    transition:transform 0.6s;
   }
-  .btn-drawki:hover ~ .drawki-shapes .d-shape,
-  .btn-drawki-wrap:hover .d-shape { opacity: 1; }
+  .btn-tempo:hover .hand2 { transform:rotate(-60deg); }
 
-  /* badges */
-  .badge {
-    position: absolute;
-    top: -10px; left: 14px;
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px;
-    font-weight: 700;
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .badge.yellow { background: var(--drawki-yellow); color: #1a1200; }
-  .badge.pink { background: var(--drawki-pink); color: white; left: auto; right: -4px; top: -8px; width: 14px; height: 14px; font-size: 7px; }
-  .btn-drawki:hover .badge { transform: scale(1.3) rotate(-10deg); }
-
-  /* ---- BOTTOM TAG ---- */
+  /* ── BOTTOM TAG ── */
   .bottom-tag {
-    margin-top: 24px;
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.3em;
-    color: rgba(255,255,255,0.12);
-    text-align: center;
+    margin-top:20px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:8px; letter-spacing:0.35em;
+    color:rgba(255,255,255,0.1); text-align:center;
   }
-
-  /* ---- ANIMATED CORNER MARKS ---- */
-  .corner {
-    position: fixed;
-    z-index: 20;
-    width: 32px; height: 32px;
-  }
-  .corner svg line { stroke: rgba(255,255,255,0.15); stroke-width: 1; }
-  .corner-tl { top: 20px; left: 20px; }
-  .corner-tr { top: 20px; right: 20px; transform: rotate(90deg); }
-  .corner-bl { bottom: 20px; left: 20px; transform: rotate(-90deg); }
-  .corner-br { bottom: 20px; right: 20px; transform: rotate(180deg); }
-
-  /* ---- SIDE LABELS ---- */
-  .side-label {
-    position: fixed;
-    z-index: 20;
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.25em;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    opacity: 0.25;
-  }
-  .side-label.left {
-    left: 24px;
-    top: 50%;
-    transform: translateY(-50%) rotate(180deg);
-    color: var(--flowly-accent);
-  }
-  .side-label.right {
-    right: 24px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--drawki-accent);
-  }
-
-  /* ANIMATED SVG NODES (left bg) */
-  .nodes-svg {
-    position: fixed;
-    left: 0; top: 0;
-    width: 50%; height: 100%;
-    z-index: 3;
-    pointer-events: none;
-    opacity: 0.25;
-  }
-  .node-circle { fill: none; stroke: var(--flowly-accent); stroke-width: 1; }
-  .node-dot { fill: var(--flowly-accent); }
-  .node-line { stroke: var(--flowly-accent); stroke-width: 0.8; stroke-dasharray: 4 6; animation: dashMove 3s linear infinite; }
-  @keyframes dashMove { to { stroke-dashoffset: -30; } }
-
-  /* FLOATING SHAPES (right bg) */
-  .shapes-svg {
-    position: fixed;
-    right: 0; top: 0;
-    width: 50%; height: 100%;
-    z-index: 3;
-    pointer-events: none;
-    opacity: 0.18;
-  }
-
-  /* pulse ring on node circles */
-  .pulse-ring {
-    fill: none;
-    stroke: var(--flowly-accent);
-    stroke-width: 0.5;
-    animation: pulseOut 2s ease-out infinite;
-    transform-origin: center;
-  }
-  @keyframes pulseOut {
-    0% { r: 10; opacity: 0.8; }
-    100% { r: 30; opacity: 0; }
-  }
-
-  /* rotating shapes */
-  .rot-shape { animation: rotateSlow linear infinite; transform-origin: center; }
-  @keyframes rotateSlow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  /* GITHUB BUTTON */
-  .github-btn {
-    position: fixed;
-    top: 18px;
-    right: 18px;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px 8px 12px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 999px;
-    color: rgba(255,255,255,0.7);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    text-decoration: none;
-    cursor: pointer;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
-    animation: enterDown 0.6s 0.4s cubic-bezier(0.22,1,0.36,1) both;
-  }
-  .github-btn:hover {
-    background: rgba(255,255,255,0.12);
-    border-color: rgba(255,255,255,0.35);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  }
-  .github-btn svg { flex-shrink: 0; transition: transform 0.3s; }
-  .github-btn:hover svg:first-child { transform: rotate(15deg) scale(1.1); }
-  .gh-stars {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 10px;
-    font-family: 'Space Mono', monospace;
-    color: var(--flowly-accent);
-    background: rgba(200,241,53,0.08);
-    border: 1px solid rgba(200,241,53,0.25);
-    border-radius: 999px;
-    padding: 2px 7px;
-    margin-left: 2px;
-    transition: background 0.3s, border-color 0.3s;
-  }
-  .github-btn:hover .gh-stars {
-    background: rgba(200,241,53,0.15);
-    border-color: rgba(200,241,53,0.5);
-  }
-
-  /* enter animation */
-  .wrapper { animation: enterDown 0.8s cubic-bezier(0.22,1,0.36,1) both; }
-  @keyframes enterDown {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* TITLE WORD split */
-  .title-block {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    margin-bottom: 4px;
-  }
-  .title-word {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: clamp(28px, 4vw, 48px);
-    line-height: 1;
-    animation: wordReveal 0.7s cubic-bezier(0.22,1,0.36,1) both;
-  }
-  .title-word:nth-child(1) { color: var(--flowly-accent); animation-delay: 0.1s; }
-  .title-word:nth-child(2) { color: rgba(255,255,255,0.15); font-size: clamp(18px,2.5vw,28px); }
-  .title-word:nth-child(3) { color: var(--drawki-accent); animation-delay: 0.25s; }
-  @keyframes wordReveal {
-    from { opacity: 0; transform: translateY(20px) skewX(-6deg); }
-    to { opacity: 1; transform: translateY(0) skewX(0); }
-  }
-
-  /* btn wrapper for shape positioning */
-  .btn-drawki-wrap {
-    position: relative;
-  }
+  .bottom-tag span { color:rgba(255,255,255,0.2); }
 </style>
 </head>
 <body>
@@ -543,145 +306,60 @@
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursorRing"></div>
 
-<!-- BACKGROUNDS -->
-<div class="bg-left"></div>
-<div class="bg-right"></div>
-<div class="grid-left"></div>
-<div class="grid-right"></div>
+<!-- AURORA -->
+<div class="aurora">
+  <div class="aurora-blob a1"></div>
+  <div class="aurora-blob a2"></div>
+  <div class="aurora-blob a3"></div>
+  <div class="aurora-blob a4"></div>
+</div>
+
+<!-- GRID -->
+<div class="grid"></div>
 
 <!-- PARTICLES -->
-<div class="particles-left" id="partsLeft"></div>
-<div class="particles-right" id="partsRight"></div>
-
-<!-- NODE GRAPH SVG (left) -->
-<svg class="nodes-svg" viewBox="0 0 683 768" preserveAspectRatio="xMidYMid slice">
-  <!-- connections -->
-  <line class="node-line" x1="100" y1="120" x2="280" y2="220"/>
-  <line class="node-line" x1="280" y1="220" x2="420" y2="160" style="animation-delay:-1s"/>
-  <line class="node-line" x1="60" y1="380" x2="280" y2="220" style="animation-delay:-2s"/>
-  <line class="node-line" x1="280" y1="220" x2="350" y2="400" style="animation-delay:-0.5s"/>
-  <line class="node-line" x1="350" y1="400" x2="160" y2="520" style="animation-delay:-1.5s"/>
-  <line class="node-line" x1="350" y1="400" x2="500" y2="480" style="animation-delay:-2.5s"/>
-  <line class="node-line" x1="160" y1="520" x2="80" y2="650" style="animation-delay:-0.8s"/>
-  <line class="node-line" x1="500" y1="480" x2="600" y2="620" style="animation-delay:-1.8s"/>
-  <!-- nodes -->
-  <g>
-    <circle class="node-circle" cx="100" cy="120" r="10"/>
-    <circle class="pulse-ring" cx="100" cy="120" r="10" style="animation-delay:0s"/>
-    <circle class="node-dot" cx="100" cy="120" r="4"/>
-  </g>
-  <g>
-    <circle class="node-circle" cx="280" cy="220" r="14"/>
-    <circle class="pulse-ring" cx="280" cy="220" r="14" style="animation-delay:0.6s"/>
-    <circle class="node-dot" cx="280" cy="220" r="5"/>
-  </g>
-  <g>
-    <circle class="node-circle" cx="420" cy="160" r="8"/>
-    <circle class="node-dot" cx="420" cy="160" r="3"/>
-  </g>
-  <g>
-    <circle class="node-circle" cx="60" cy="380" r="10"/>
-    <circle class="node-dot" cx="60" cy="380" r="4"/>
-    <circle class="pulse-ring" cx="60" cy="380" r="10" style="animation-delay:1.2s"/>
-  </g>
-  <g>
-    <circle class="node-circle" cx="350" cy="400" r="16"/>
-    <circle class="pulse-ring" cx="350" cy="400" r="16" style="animation-delay:0.3s"/>
-    <circle class="node-dot" cx="350" cy="400" r="6"/>
-  </g>
-  <g>
-    <circle class="node-circle" cx="160" cy="520" r="10"/>
-    <circle class="node-dot" cx="160" cy="520" r="4"/>
-  </g>
-  <g>
-    <circle class="node-circle" cx="500" cy="480" r="12"/>
-    <circle class="pulse-ring" cx="500" cy="480" r="12" style="animation-delay:0.9s"/>
-    <circle class="node-dot" cx="500" cy="480" r="5"/>
-  </g>
-  <g>
-    <circle class="node-circle" cx="80" cy="650" r="8"/>
-    <circle class="node-dot" cx="80" cy="650" r="3"/>
-  </g>
-  <g>
-    <circle class="node-circle" cx="600" cy="620" r="10"/>
-    <circle class="node-dot" cx="600" cy="620" r="4"/>
-  </g>
-</svg>
-
-<!-- FLOATING SHAPES SVG (right) -->
-<svg class="shapes-svg" viewBox="0 0 683 768" preserveAspectRatio="xMidYMid slice">
-  <!-- sticky note outline -->
-  <rect x="80" y="80" width="90" height="90" rx="3" fill="none" stroke="#f0c040" stroke-width="1.2"
-    style="animation: rotateSlow 40s linear infinite; transform-origin: 125px 125px;"/>
-  <!-- ellipse -->
-  <ellipse cx="540" cy="160" rx="60" ry="45" fill="none" stroke="#e8547a" stroke-width="1.2"
-    style="animation: rotateSlow 25s linear infinite reverse; transform-origin: 540px 160px;"/>
-  <!-- triangle -->
-  <polygon points="140,500 200,400 260,500" fill="none" stroke="#7c6ff7" stroke-width="1"
-    style="animation: rotateSlow 35s linear infinite; transform-origin: 200px 467px;"/>
-  <!-- diamond -->
-  <polygon points="480,520 530,460 580,520 530,580" fill="none" stroke="#f0c040" stroke-width="1"
-    style="animation: rotateSlow 30s linear infinite reverse; transform-origin: 530px 520px;"/>
-  <!-- small rect -->
-  <rect x="300" y="620" width="50" height="50" rx="2" fill="none" stroke="#e8547a" stroke-width="0.8"
-    style="animation: rotateSlow 20s linear infinite; transform-origin: 325px 645px;"/>
-  <!-- dots grid -->
-  <g fill="#7c6ff7" opacity="0.6">
-    <circle cx="400" cy="320" r="2.5"/>
-    <circle cx="430" cy="320" r="2.5"/>
-    <circle cx="460" cy="320" r="2.5"/>
-    <circle cx="400" cy="350" r="2.5"/>
-    <circle cx="430" cy="350" r="2.5"/>
-    <circle cx="460" cy="350" r="2.5"/>
-  </g>
-  <!-- star -->
-  <polygon points="200,200 210,180 220,200 240,205 225,220 230,240 210,230 190,240 195,220 180,205"
-    fill="none" stroke="#f0c040" stroke-width="0.8"
-    style="animation: rotateSlow 18s linear infinite; transform-origin: 210px 210px;"/>
-</svg>
-
-<!-- DIVIDER -->
-<div class="divider"></div>
+<div class="particles" id="particles"></div>
 
 <!-- CORNERS -->
-<div class="corner corner-tl"><svg viewBox="0 0 32 32"><line x1="0" y1="0" x2="32" y2="0"/><line x1="0" y1="0" x2="0" y2="32"/></svg></div>
-<div class="corner corner-tr"><svg viewBox="0 0 32 32"><line x1="0" y1="0" x2="32" y2="0"/><line x1="0" y1="0" x2="0" y2="32"/></svg></div>
-<div class="corner corner-bl"><svg viewBox="0 0 32 32"><line x1="0" y1="0" x2="32" y2="0"/><line x1="0" y1="0" x2="0" y2="32"/></svg></div>
-<div class="corner corner-br"><svg viewBox="0 0 32 32"><line x1="0" y1="0" x2="32" y2="0"/><line x1="0" y1="0" x2="0" y2="32"/></svg></div>
+<div class="corner corner-tl"><svg viewBox="0 0 28 28"><line x1="0" y1="0" x2="28" y2="0"/><line x1="0" y1="0" x2="0" y2="28"/></svg></div>
+<div class="corner corner-tr"><svg viewBox="0 0 28 28"><line x1="0" y1="0" x2="28" y2="0"/><line x1="0" y1="0" x2="0" y2="28"/></svg></div>
+<div class="corner corner-bl"><svg viewBox="0 0 28 28"><line x1="0" y1="0" x2="28" y2="0"/><line x1="0" y1="0" x2="0" y2="28"/></svg></div>
+<div class="corner corner-br"><svg viewBox="0 0 28 28"><line x1="0" y1="0" x2="28" y2="0"/><line x1="0" y1="0" x2="0" y2="28"/></svg></div>
 
 <!-- SIDE LABELS -->
-<div class="side-label left">FLOWLY NOTES</div>
-<div class="side-label right">DRAWKIBOARD</div>
+<div class="side-label left">FLOWLY · DRAWKI</div>
+<div class="side-label right">TEMPO · SUITE 2025</div>
 
-<!-- GITHUB BUTTON -->
-<a href="https://github.com/Atromost/Flowly-Notes" target="_blank" class="github-btn" title="Flowly Notes on GitHub">
-  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+<!-- GITHUB -->
+<a href="https://github.com/Atromost/Flowly-Notes" target="_blank" class="github-btn">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
   </svg>
   <span>GitHub</span>
-  <div class="gh-stars">
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-    OSS
-  </div>
+  <div class="gh-badge">OSS</div>
 </a>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div class="wrapper">
-  <div class="title-block">
-    <span class="title-word">Flowly</span>
-    <span class="title-word">&times;</span>
-    <span class="title-word">Drawki</span>
+  <div class="eyebrow">Creative Suite — Your Tools, One Place</div>
+
+  <div class="title-row">
+    <span class="title-word t-flowly">Flowly</span>
+    <span class="title-word t-sep">×</span>
+    <span class="title-word t-drawki">Drawki</span>
+    <span class="title-word t-sep2">×</span>
+    <span class="title-word t-tempo">Tempo</span>
   </div>
-  <div class="headline">Choose your creative workspace</div>
-  <div class="subtitle">Node-based notes &nbsp;·&nbsp; Freeform canvas</div>
+
+  <div class="subtitle">Node notes &nbsp;·&nbsp; Freeform canvas &nbsp;·&nbsp; Precision timer</div>
 
   <div class="buttons-row">
-    <!-- FLOWLY NOTES BUTTON -->
-    <a href="Flowlynotes.html" class="btn-flowly">
-      <div class="scanline"></div>
-      <span class="node-tag">v2.1</span>
-      <!-- Flowly icon: node graph -->
-      <svg class="icon" width="22" height="22" viewBox="0 0 22 22" fill="none">
+
+    <!-- FLOWLY -->
+    <a href="Flowlynotes.html" class="btn btn-flowly">
+      <span class="chip">v2.1</span>
+      <div class="fill"></div>
+      <svg class="icon" width="20" height="20" viewBox="0 0 22 22" fill="none">
         <circle cx="4" cy="11" r="2.5" stroke="currentColor" stroke-width="1.5"/>
         <circle cx="18" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/>
         <circle cx="18" cy="17" r="2.5" stroke="currentColor" stroke-width="1.5"/>
@@ -693,73 +371,103 @@
       Flowly Notes
     </a>
 
-    <div class="or-sep">OR</div>
+    <div class="or-sep">·</div>
 
-    <!-- DRAWKI BUTTON -->
-    <div class="btn-drawki-wrap">
-      <a href="Drawkiboard.html" class="btn-drawki" id="drawkiBtn">
-        <!-- floating badges -->
-        <div class="badge yellow">✦</div>
-        <div class="badge pink">●</div>
-        <!-- Drawki icon: pencil + shapes -->
-        <svg class="icon" width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <rect x="3" y="13" width="8" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
-          <ellipse cx="16" cy="7" rx="4" ry="4" stroke="currentColor" stroke-width="1.5"/>
-          <line x1="9" y1="3" x2="13" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2"/>
-        </svg>
-        DrawkiBoard
-      </a>
-    </div>
+    <!-- DRAWKI -->
+    <a href="Drawkiboard.html" class="btn btn-drawki" id="drawkiBtn">
+      <div class="dot-a">✦</div>
+      <div class="dot-b">●</div>
+      <div class="fill"></div>
+      <svg class="icon" width="20" height="20" viewBox="0 0 22 22" fill="none">
+        <rect x="3" y="13" width="8" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+        <ellipse cx="16" cy="7" rx="4" ry="4" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="9" y1="3" x2="13" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2"/>
+      </svg>
+      DrawkiBoard
+    </a>
+
+    <div class="or-sep">·</div>
+
+    <!-- TEMPO -->
+    <a href="stopwatch.html" class="btn btn-tempo">
+      <span class="new-tag">NEW</span>
+      <div class="fill"></div>
+      <svg class="icon" width="20" height="20" viewBox="0 0 22 22" fill="none">
+        <!-- clock body -->
+        <circle cx="11" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/>
+        <!-- crown -->
+        <rect x="9" y="2" width="4" height="2.5" rx="1" stroke="currentColor" stroke-width="1.5"/>
+        <!-- button -->
+        <rect x="14.5" y="3.5" width="3" height="1.8" rx="0.9" stroke="currentColor" stroke-width="1.2" transform="rotate(35 16 4.4)"/>
+        <!-- minute hand -->
+        <line class="hand" x1="11" y1="12" x2="11" y2="6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <!-- hour hand -->
+        <line class="hand2" x1="11" y1="12" x2="14.5" y2="14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- center dot -->
+        <circle cx="11" cy="12" r="1.2" fill="currentColor"/>
+      </svg>
+      Tempo
+    </a>
+
   </div>
 
-  <div class="bottom-tag">CREATIVE SUITE &nbsp;·&nbsp; OPEN SOURCE &nbsp;·&nbsp; 2025</div>
+  <div class="bottom-tag">
+    <span>CREATIVE SUITE</span> &nbsp;·&nbsp; OPEN SOURCE &nbsp;·&nbsp; <span>2025</span>
+  </div>
 </div>
 
 <script>
 // CURSOR
 const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursorRing');
-let mx = -100, my = -100, rx = -100, ry = -100;
-document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-(function animCursor() {
-  cursor.style.left = mx - 6 + 'px';
-  cursor.style.top = my - 6 + 'px';
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) * 0.12;
-  ring.style.left = rx - 18 + 'px';
-  ring.style.top = ry - 18 + 'px';
-  requestAnimationFrame(animCursor);
+const ring   = document.getElementById('cursorRing');
+let mx=-100,my=-100,rx=-100,ry=-100;
+document.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; });
+(function tick(){
+  cursor.style.left = mx-5+'px'; cursor.style.top = my-5+'px';
+  rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+  ring.style.left = rx-16+'px'; ring.style.top = ry-16+'px';
+  requestAnimationFrame(tick);
 })();
 
-// PARTICLES
-function makeDots(container, colorClass, count) {
-  for (let i = 0; i < count; i++) {
-    const d = document.createElement('div');
-    d.className = `p-dot ${colorClass}`;
-    const size = Math.random() * 3 + 1.5;
-    d.style.cssText = `
-      width:${size}px; height:${size}px;
-      left:${Math.random()*100}%;
-      bottom:${Math.random()*20-10}%;
-      animation-duration:${6 + Math.random()*10}s;
-      animation-delay:${Math.random()*8}s;
-    `;
-    container.appendChild(d);
-  }
-}
-makeDots(document.getElementById('partsLeft'), 'green', 18);
-makeDots(document.getElementById('partsRight'), 'purple', 10);
-makeDots(document.getElementById('partsRight'), 'pink', 8);
+// ring scale on hover
+document.querySelectorAll('.btn, .github-btn').forEach(el=>{
+  el.addEventListener('mouseenter', ()=>{ ring.style.transform='scale(1.8)'; ring.style.opacity='0.5'; });
+  el.addEventListener('mouseleave', ()=>{ ring.style.transform='scale(1)';   ring.style.opacity='1'; });
+});
 
-// DRAWKI BUTTON bubble on hover
-document.getElementById('drawkiBtn').addEventListener('mouseenter', function(e) {
+// PARTICLES
+const P = document.getElementById('particles');
+const colors = ['#c8f135','#7c6ff7','#e8547a','#ff6b2b','#ffd166'];
+for(let i=0;i<40;i++){
+  const d = document.createElement('div');
+  d.className='p-dot';
+  const s = Math.random()*3+1.2;
+  const c = colors[Math.floor(Math.random()*colors.length)];
+  d.style.cssText=`
+    width:${s}px;height:${s}px;
+    background:${c}; box-shadow:0 0 6px ${c};
+    left:${Math.random()*100}%;
+    bottom:${Math.random()*20-10}%;
+    animation-duration:${7+Math.random()*12}s;
+    animation-delay:${Math.random()*10}s;
+  `;
+  P.appendChild(d);
+}
+
+// DRAWKI bubble on hover
+document.getElementById('drawkiBtn').addEventListener('mouseenter', function(e){
   const b = document.createElement('div');
-  b.className = 'bubble';
+  b.style.cssText='position:absolute;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;animation:bPop 0.6s ease-out forwards;';
   const r = this.getBoundingClientRect();
-  const size = 60;
-  b.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-r.left-size/2}px;top:${e.clientY-r.top-size/2}px`;
+  const sz = 60;
+  b.style.width=b.style.height=sz+'px';
+  b.style.left=e.clientX-r.left-sz/2+'px';
+  b.style.top=e.clientY-r.top-sz/2+'px';
+  const style=document.createElement('style');
+  style.textContent='@keyframes bPop{0%{transform:scale(0);opacity:1}100%{transform:scale(4);opacity:0}}';
+  document.head.appendChild(style);
   this.appendChild(b);
-  setTimeout(() => b.remove(), 700);
+  setTimeout(()=>b.remove(),700);
 });
 </script>
 </body>
