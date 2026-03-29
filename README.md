@@ -1,34 +1,35 @@
-# 🌌 Flowly Notes — Infinite Canvas Workspace
+# 🌌 DrawkiFlow -Your Tools One Place
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.0.0-blueviolet.svg)]()
 [![Style](https://img.shields.io/badge/aesthetic-Dark%20Neon-cyan.svg)]()
 
-**Flowly Notes** is a high-performance, browser-based infinite canvas designed for visual thinkers. It allows you to map out complex ideas, manage tasks, and collect media in a boundless, zoomable workspace.
-
+**DrawkiFlow** unifies productivity tools in one evolving platform, adding new features continuously. Built with an indie vision, *it prioritizes simplicity, efficiency, and strong user privacy*.
 ---
 
-## Visual Guid 
+## Main GUI
 
 For the best visual representation of the workspace, focus on these key views:
-<img width="1358" height="644" alt="msedge_KUAj9lWTLk" src="https://github.com/user-attachments/assets/b366c509-c36c-4fb0-b765-8269c92f3e36" />
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/b7bf7f5c-9a8e-4634-8ec9-6b82968e33b1" />
 
-* **The Master Map:** A wide shot showing multiple node types (Notes, Todos, Images) connected via yellow bezier curves.
-* **The Drawing Layer:** A shot of the canvas with freehand annotations (**D tool**) circling specific groups of notes.
-* **Multimedia Flow:** A cluster of **Embed** nodes showing a YouTube video and a Spotify playlist side-by-side.
-* **Focus Mode:** The UI-less "Presentation" view (`Ctrl` + `.`) showing only content on the dark grid.
+
+* **FlowlyNotes:** A wide shot showing multiple node types (Notes, Todos, Images) connected via yellow bezier curves.
+* **DrawkiBoardr:** A basic, simple user interface for a whiteboard is also included..
+* **Tempo::** A stopwatch featuring a simple and distinctive design is included.
+* **Comming Soon!** 
 
 ---
 
 ## 🚀 Key Features
 
-### 🛠️ The Power Toolset
-* **Smart Connections:** Drag from any node dot to link ideas. Flowly automatically calculates the shortest path and snaps the arrow to the nearest edge.
-* **Media Auto-Embed:** Paste a link to YouTube, Spotify, or Vimeo; Flowly handles the iframe conversion automatically.
-* **Global Image Support:** Drag images from your desktop or paste from your clipboard.
-* **Freehand Layer:** Annotate thoughts with a built-in drawing engine for circling or sketching.
+* **Easy To Use**
+* **OpenSouce**
+* **No Login required**
 
-### 🗂️ Specialized Nodes
+## FlowlyNotes
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/1ae9adab-67fe-4c5e-aecb-7d6383e13a20" />
+
+### 🗂️ Specialized Nodes(FlowlyNotes)
 | Node | Type | Description |
 | :--- | :--- | :--- |
 | 📝 | **Note** | Rich-text editing with a floating formatting bar. |
@@ -36,11 +37,6 @@ For the best visual representation of the workspace, focus on these key views:
 | 🖼️ | **Image** | High-performance image hosting with captioning. |
 | 🔗 | **Embed** | Live, interactive web content (YouTube/Spotify). |
 | 📌 | **Sticky** | High-speed brainstorming and organizational titling. |
-
-### 🧭 Navigation & Workflow
-* **Infinite Panning:** Hold `Space` and drag to move through miles of canvas.
-* **Fit-to-View:** Press `F` to instantly zoom out and see everything at once.
-* **Local Persistence:** Auto-saved to your browser. Export to `.json` to back up or migrate data.
 
 ---
 
@@ -58,13 +54,16 @@ For the best visual representation of the workspace, focus on these key views:
 ---
 
 ## DrawkiBoard 
-
-<img width="230" height="41" alt="image" src="https://github.com/user-attachments/assets/362fc028-5d8b-4463-8ba1-5827ec1c96dc" />
-
-Here,You Redirect To DrawkiBoard Page That is a online whiteboard !
+### Hover over tools to view their corresponding shortcut keys.
 <img width="1358" height="644" alt="image" src="https://github.com/user-attachments/assets/41785da3-8851-43a7-a5d0-798635c5b31f" />
 
+## Tempo
 
+* **Custom Live Wallpaper supported**
+* **Simple User interface**
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/98ed0822-dd69-43af-bee6-e37a8b9b65d6" />
+
+---
 
 > **Note:** Flowly Notes and Drawkiboard uses hardware acceleration for smooth panning across large canvases.
 
