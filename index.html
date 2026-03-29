@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Creative Suite</title>
+<title>DrawkiFlow — Your Tools, One Place</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,7 +15,6 @@
     --tempo: #ff6b2b;
     --tempo-gold: #ffd166;
     --bg: #080810;
-    --glass: rgba(255,255,255,0.03);
     --border: rgba(255,255,255,0.08);
   }
 
@@ -43,26 +42,19 @@
     position:fixed; width:32px; height:32px;
     border-radius:50%; border:1px solid rgba(255,255,255,0.35);
     pointer-events:none; z-index:9998;
-    transition: all 0.22s ease;
+    transition: transform 0.22s ease, opacity 0.22s ease;
   }
 
   /* ── AURORA BG ── */
-  .aurora {
-    position:fixed; inset:0; z-index:0; pointer-events:none;
-    overflow:hidden;
-  }
-  .aurora-blob {
-    position:absolute; border-radius:50%; filter:blur(80px);
-    opacity:0.12; animation:drift ease-in-out infinite alternate;
-  }
+  .aurora { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .aurora-blob { position:absolute; border-radius:50%; filter:blur(80px); opacity:0.12; animation:drift ease-in-out infinite alternate; }
   .a1 { width:600px;height:500px; background:var(--flowly); top:-100px;left:-150px; animation-duration:14s; }
   .a2 { width:500px;height:400px; background:var(--drawki); bottom:-80px;right:-100px; animation-duration:18s; animation-delay:-6s; }
   .a3 { width:350px;height:350px; background:var(--tempo); top:50%;left:50%; transform:translate(-50%,-50%); animation-duration:10s; animation-delay:-3s; opacity:0.07; }
   .a4 { width:300px;height:300px; background:var(--tempo-gold); bottom:10%;right:30%; animation-duration:22s; animation-delay:-9s; opacity:0.06; }
-
   @keyframes drift {
     from { transform: translate(0,0) scale(1); }
-    to   { transform: translate(40px, 30px) scale(1.08); }
+    to   { transform: translate(40px,30px) scale(1.08); }
   }
 
   /* ── GRID ── */
@@ -83,10 +75,7 @@
 
   /* ── FLOATING PARTICLES ── */
   .particles { position:fixed; inset:0; z-index:3; pointer-events:none; overflow:hidden; }
-  .p-dot {
-    position:absolute; border-radius:50%;
-    animation: floatUp linear infinite;
-  }
+  .p-dot { position:absolute; border-radius:50%; animation: floatUp linear infinite; }
   @keyframes floatUp {
     0%   { transform:translateY(0) scale(1); opacity:0; }
     10%  { opacity:1; }
@@ -108,10 +97,10 @@
     font-family:'JetBrains Mono', monospace; font-size:8px;
     letter-spacing:0.3em; writing-mode:vertical-rl;
     text-orientation:mixed; opacity:0.2;
-    top:50%; transform:translateY(-50%);
+    top:50%;
   }
-  .side-label.left { left:22px; color:var(--flowly); transform:translateY(-50%) rotate(180deg); }
-  .side-label.right { right:22px; color:var(--tempo); }
+  .side-label.left  { left:22px;  color:var(--flowly); transform:translateY(-50%) rotate(180deg); }
+  .side-label.right { right:22px; color:var(--tempo);  transform:translateY(-50%); }
 
   /* ── GITHUB BUTTON ── */
   .github-btn {
@@ -141,163 +130,191 @@
   }
   .github-btn:hover .gh-badge { background:rgba(200,241,53,0.15); border-color:rgba(200,241,53,0.4); }
 
+  @keyframes slideDown {
+    from { opacity:0; transform:translateY(-12px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
   /* ── MAIN WRAPPER ── */
   .wrapper {
     position:relative; z-index:20;
     display:flex; flex-direction:column;
-    align-items:center; gap:14px;
+    align-items:center; gap:18px;
     animation:riseUp 0.9s cubic-bezier(0.22,1,0.36,1) both;
   }
   @keyframes riseUp {
     from { opacity:0; transform:translateY(30px); }
     to   { opacity:1; transform:translateY(0); }
   }
-  @keyframes slideDown {
-    from { opacity:0; transform:translateY(-12px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
 
-  /* ── TITLE ── */
+  /* ── EYEBROW ── */
   .eyebrow {
     font-family:'JetBrains Mono', monospace;
-    font-size:10px; letter-spacing:0.4em;
-    text-transform:uppercase; color:rgba(255,255,255,0.28);
+    font-size:10px; letter-spacing:0.45em;
+    text-transform:uppercase; color:rgba(255,255,255,0.25);
     text-align:center;
+    animation: fadeIn 0.8s 0.1s both;
   }
 
-  .title-row {
-    display:flex; align-items:center; gap:14px;
-    margin:2px 0 2px;
-  }
-  .title-word {
-    font-family:'Bebas Neue', sans-serif;
-    font-size: clamp(36px, 5.5vw, 64px);
+  /* ── BRAND LOGO ── */
+  .brand {
+    display:flex; align-items:baseline; gap:0;
     line-height:1;
-    animation: letterPop 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    animation: letterPop 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s both;
   }
-  .t-flowly { color:var(--flowly); animation-delay:0.1s; }
-  .t-sep    { color:rgba(255,255,255,0.12); font-size:clamp(22px,3vw,36px); animation-delay:0.2s; }
-  .t-drawki { color:var(--drawki); animation-delay:0.3s; }
-  .t-sep2   { color:rgba(255,255,255,0.12); font-size:clamp(22px,3vw,36px); animation-delay:0.35s; }
-  .t-tempo  { color:var(--tempo); animation-delay:0.4s; }
+  .brand-drawki {
+    font-family:'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 9vw, 110px);
+    letter-spacing: -0.01em;
+    background: linear-gradient(110deg, var(--drawki) 0%, var(--drawki-pink) 55%, var(--flowly) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 40px rgba(124,111,247,0.35));
+  }
+  .brand-flow {
+    font-family:'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 9vw, 110px);
+    letter-spacing: -0.01em;
+    background: linear-gradient(110deg, var(--flowly) 0%, #9ef53a 40%, var(--tempo-gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 40px rgba(200,241,53,0.3));
+  }
+  .brand-dot {
+    font-family:'Bebas Neue', sans-serif;
+    font-size: clamp(20px, 3.5vw, 44px);
+    color: rgba(255,255,255,0.15);
+    margin: 0 4px;
+    align-self: center;
+    -webkit-text-fill-color: rgba(255,255,255,0.15);
+  }
   @keyframes letterPop {
-    from { opacity:0; transform:translateY(18px) skewX(-5deg); }
+    from { opacity:0; transform:translateY(24px) skewX(-4deg); }
     to   { opacity:1; transform:translateY(0) skewX(0); }
   }
 
-  .subtitle {
-    font-size:12px; font-weight:300;
-    color:rgba(255,255,255,0.2); letter-spacing:0.06em;
-    text-align:center; margin-top:-4px; margin-bottom:10px;
+  /* ── TAGLINE ── */
+  .tagline {
+    display:flex; align-items:center; gap:10px;
+    animation: fadeIn 0.8s 0.35s both;
   }
+  .tagline-word {
+    font-family:'JetBrains Mono', monospace;
+    font-size: clamp(9px, 1.1vw, 12px);
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+  }
+  .tw-flowly { color:var(--flowly); }
+  .tw-drawki { color:var(--drawki); }
+  .tw-tempo  { color:var(--tempo); }
+  .tagline-sep { width:28px; height:1px; background:rgba(255,255,255,0.12); }
 
-  /* ── BUTTON ROW ── */
-  .buttons-row {
-    display:flex; align-items:center; gap:18px;
-    flex-wrap:wrap; justify-content:center;
+  /* ── PILL BADGES ── */
+  .badges {
+    display:flex; align-items:center; gap:10px;
+    animation: fadeIn 0.8s 0.5s both;
   }
-
-  .or-sep {
-    font-family:'JetBrains Mono',monospace; font-size:9px;
-    color:rgba(255,255,255,0.15); letter-spacing:0.2em;
-    padding:0 4px;
+  .badge {
+    font-family:'JetBrains Mono', monospace;
+    font-size:9px; letter-spacing:0.2em;
+    padding:5px 14px; border-radius:999px;
+    border:1px solid; text-transform:uppercase;
   }
-
-  /* shared button base */
-  .btn {
-    position:relative;
-    display:flex; align-items:center; gap:11px;
-    padding:16px 28px;
-    font-family:'Outfit', sans-serif; font-size:14px; font-weight:600;
-    text-decoration:none; cursor:pointer;
-    overflow:hidden; transition:all 0.35s ease;
-    letter-spacing:0.03em;
-  }
-  .btn .icon { flex-shrink:0; transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1); }
-  .btn:hover .icon { transform:scale(1.2) rotate(8deg); }
-  .btn .fill {
-    position:absolute; inset:0; z-index:-1;
-    transform:translateY(101%);
-    transition:transform 0.4s cubic-bezier(0.77,0,0.18,1);
-  }
-  .btn:hover .fill { transform:translateY(0); }
-
-  /* ── FLOWLY BUTTON ── */
-  .btn-flowly {
-    border:1.5px solid var(--flowly); color:var(--flowly);
-    clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
-  }
-  .btn-flowly .fill { background:var(--flowly); }
-  .btn-flowly:hover { color:#080810; }
-  .btn-flowly .chip {
-    position:absolute; top:-8px; right:12px;
-    font-family:'JetBrains Mono',monospace; font-size:7px;
-    letter-spacing:0.1em; color:var(--flowly);
-    background:var(--bg); border:1px solid var(--flowly);
-    padding:1px 5px; transition:all 0.3s;
-  }
-  .btn-flowly:hover .chip { background:var(--flowly); color:#080810; }
-
-  /* ── DRAWKI BUTTON ── */
-  .btn-drawki {
-    border:1.5px solid var(--drawki); color:#d8d4ff;
-    border-radius:10px;
-  }
-  .btn-drawki .fill { background:linear-gradient(135deg, var(--drawki), var(--drawki-pink)); }
-  .btn-drawki:hover { color:white; border-color:transparent; }
-  .btn-drawki .dot-a, .btn-drawki .dot-b {
-    position:absolute; border-radius:50%;
-    font-size:9px; font-weight:700;
-    display:flex; align-items:center; justify-content:center;
-    transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .btn-drawki .dot-a { top:-9px; left:12px; width:18px;height:18px; background:#ffd166; color:#1a0d00; }
-  .btn-drawki .dot-b { top:-7px; right:-3px; width:13px;height:13px; background:var(--drawki-pink); color:#fff; font-size:7px; }
-  .btn-drawki:hover .dot-a { transform:scale(1.4) rotate(-15deg); }
-  .btn-drawki:hover .dot-b { transform:scale(1.4) rotate(15deg); }
-
-  /* ── TEMPO BUTTON ── */
-  .btn-tempo {
-    border:1.5px solid var(--tempo); color:var(--tempo);
-    clip-path:polygon(0% 8px, 8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%);
-  }
-  .btn-tempo .fill { background:linear-gradient(135deg, var(--tempo), var(--tempo-gold)); }
-  .btn-tempo:hover { color:#0a0800; }
-  .btn-tempo .new-tag {
-    position:absolute; top:-9px; left:12px;
-    font-family:'JetBrains Mono',monospace; font-size:7px;
-    letter-spacing:0.12em; padding:1px 6px;
-    border-radius:999px;
-    background:var(--tempo); color:#fff;
-    transition:all 0.3s;
-    animation:pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%,100% { box-shadow:0 0 0 0 rgba(255,107,43,0.4); }
-    50%      { box-shadow:0 0 0 5px rgba(255,107,43,0); }
-  }
-  .btn-tempo:hover .new-tag { background:#0a0800; color:var(--tempo); }
-
-  /* clock hand spin on tempo icon */
-  .btn-tempo .hand {
-    transform-origin: 11px 11px;
-    transition:transform 0.4s;
-  }
-  .btn-tempo:hover .hand { transform:rotate(90deg); }
-  .btn-tempo .hand2 {
-    transform-origin: 11px 11px;
-    transition:transform 0.6s;
-  }
-  .btn-tempo:hover .hand2 { transform:rotate(-60deg); }
+  .badge-flowly { color:var(--flowly); border-color:rgba(200,241,53,0.25); background:rgba(200,241,53,0.06); }
+  .badge-drawki { color:var(--drawki); border-color:rgba(124,111,247,0.25); background:rgba(124,111,247,0.06); }
+  .badge-tempo  { color:var(--tempo);  border-color:rgba(255,107,43,0.25);  background:rgba(255,107,43,0.06); }
 
   /* ── BOTTOM TAG ── */
   .bottom-tag {
-    margin-top:20px;
     font-family:'JetBrains Mono', monospace;
     font-size:8px; letter-spacing:0.35em;
     color:rgba(255,255,255,0.1); text-align:center;
+    animation: fadeIn 0.8s 0.65s both;
   }
   .bottom-tag span { color:rgba(255,255,255,0.2); }
+
+  @keyframes fadeIn {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* ══════════════════════
+     DOCK
+  ══════════════════════ */
+  .dock-outer {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    height: 96px;
+  }
+  .dock-panel {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 0 14px 10px;
+    background: rgba(12,12,22,0.75);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+    height: 72px;
+  }
+  .dock-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.09);
+    text-decoration: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    overflow: visible;
+    transition: border-color 0.2s;
+  }
+  .dock-item:hover { border-color: rgba(255,255,255,0.2); }
+  .dock-item svg { pointer-events: none; display: block; }
+  .dock-label {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    white-space: nowrap;
+    background: rgba(10,10,20,0.94);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 7px;
+    padding: 4px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.8);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    backdrop-filter: blur(8px);
+  }
+  .dock-item:hover .dock-label { opacity:1; transform:translateX(-50%) translateY(0); }
+  .dock-sep {
+    width: 1px; height: 38px;
+    background: rgba(255,255,255,0.08);
+    align-self: center; flex-shrink: 0; margin: 0 2px;
+  }
+  .dock-dot {
+    position: absolute;
+    bottom: -6px; left: 50%;
+    transform: translateX(-50%);
+    width: 4px; height: 4px;
+    border-radius: 50%; opacity: 0.55;
+  }
 </style>
 </head>
 <body>
@@ -327,8 +344,8 @@
 <div class="corner corner-br"><svg viewBox="0 0 28 28"><line x1="0" y1="0" x2="28" y2="0"/><line x1="0" y1="0" x2="0" y2="28"/></svg></div>
 
 <!-- SIDE LABELS -->
-<div class="side-label left">FLOWLY · DRAWKI</div>
-<div class="side-label right">TEMPO · SUITE 2025</div>
+<div class="side-label left">FLOWLY · DRAWKI · TEMPO</div>
+<div class="side-label right">DRAWKIFLOW · SUITE 2025</div>
 
 <!-- GITHUB -->
 <a href="https://github.com/Atromost/Flowly-Notes" target="_blank" class="github-btn">
@@ -341,134 +358,206 @@
 
 <!-- MAIN -->
 <div class="wrapper">
-  <div class="eyebrow">Creative Suite — Your Tools, One Place</div>
 
-  <div class="title-row">
-    <span class="title-word t-flowly">Flowly</span>
-    <span class="title-word t-sep">×</span>
-    <span class="title-word t-drawki">Drawki</span>
-    <span class="title-word t-sep2">×</span>
-    <span class="title-word t-tempo">Tempo</span>
+  <div class="eyebrow">Creative Suite — Est. 2025</div>
+
+  <!-- BRAND NAME -->
+  <div class="brand">
+    <span class="brand-drawki">Drawki</span>
+    <span class="brand-dot">·</span>
+    <span class="brand-flow">Flow</span>
   </div>
 
-  <div class="subtitle">Node notes &nbsp;·&nbsp; Freeform canvas &nbsp;·&nbsp; Precision timer</div>
+  <!-- TOOL TAGLINE -->
+  <div class="tagline">
+    <span class="tagline-word tw-flowly">Flowly</span>
+    <div class="tagline-sep"></div>
+    <span class="tagline-word tw-drawki">Drawki</span>
+    <div class="tagline-sep"></div>
+    <span class="tagline-word tw-tempo">Tempo</span>
+  </div>
 
-  <div class="buttons-row">
+  <!-- YOUR TOOLS ONE PLACE -->
+  <div class="bottom-tag" style="margin-top:-8px; font-size:9px; letter-spacing:0.28em; color:rgba(255,255,255,0.18);">
+    YOUR TOOLS &nbsp;·&nbsp; <span>ONE PLACE</span>
+  </div>
 
-    <!-- FLOWLY -->
-    <a href="Flowlynotes.html" class="btn btn-flowly">
-      <span class="chip">v2.1</span>
-      <div class="fill"></div>
-      <svg class="icon" width="20" height="20" viewBox="0 0 22 22" fill="none">
-        <circle cx="4" cy="11" r="2.5" stroke="currentColor" stroke-width="1.5"/>
-        <circle cx="18" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/>
-        <circle cx="18" cy="17" r="2.5" stroke="currentColor" stroke-width="1.5"/>
-        <circle cx="11" cy="11" r="2.5" stroke="currentColor" stroke-width="1.5"/>
-        <line x1="6.5" y1="11" x2="8.5" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="13.5" y1="11" x2="15.5" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="13.5" y1="11" x2="15.5" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      Flowly Notes
-    </a>
-
-    <div class="or-sep">·</div>
-
-    <!-- DRAWKI -->
-    <a href="Drawkiboard.html" class="btn btn-drawki" id="drawkiBtn">
-      <div class="dot-a">✦</div>
-      <div class="dot-b">●</div>
-      <div class="fill"></div>
-      <svg class="icon" width="20" height="20" viewBox="0 0 22 22" fill="none">
-        <rect x="3" y="13" width="8" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
-        <ellipse cx="16" cy="7" rx="4" ry="4" stroke="currentColor" stroke-width="1.5"/>
-        <line x1="9" y1="3" x2="13" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2"/>
-      </svg>
-      DrawkiBoard
-    </a>
-
-    <div class="or-sep">·</div>
-
-    <!-- TEMPO -->
-    <a href="stopwatch.html" class="btn btn-tempo">
-      <span class="new-tag">NEW</span>
-      <div class="fill"></div>
-      <svg class="icon" width="20" height="20" viewBox="0 0 22 22" fill="none">
-        <!-- clock body -->
-        <circle cx="11" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/>
-        <!-- crown -->
-        <rect x="9" y="2" width="4" height="2.5" rx="1" stroke="currentColor" stroke-width="1.5"/>
-        <!-- button -->
-        <rect x="14.5" y="3.5" width="3" height="1.8" rx="0.9" stroke="currentColor" stroke-width="1.2" transform="rotate(35 16 4.4)"/>
-        <!-- minute hand -->
-        <line class="hand" x1="11" y1="12" x2="11" y2="6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        <!-- hour hand -->
-        <line class="hand2" x1="11" y1="12" x2="14.5" y2="14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        <!-- center dot -->
-        <circle cx="11" cy="12" r="1.2" fill="currentColor"/>
-      </svg>
-      Tempo
-    </a>
-
+  <!-- PILL BADGES -->
+  <div class="badges">
+    <div class="badge badge-flowly">Node Notes</div>
+    <div class="badge badge-drawki">Freeform Canvas</div>
+    <div class="badge badge-tempo">Precision Timer</div>
   </div>
 
   <div class="bottom-tag">
-    <span>CREATIVE SUITE</span> &nbsp;·&nbsp; OPEN SOURCE &nbsp;·&nbsp; <span>2025</span>
+    <span>DRAWKIFLOW</span> &nbsp;·&nbsp; OPEN SOURCE &nbsp;·&nbsp; <span>2025</span>
   </div>
+
+</div>
+
+<!-- DOCK -->
+<div class="dock-outer">
+  <div class="dock-panel" id="dockPanel"></div>
 </div>
 
 <script>
-// CURSOR
+/* ─── CURSOR ─── */
 const cursor = document.getElementById('cursor');
 const ring   = document.getElementById('cursorRing');
-let mx=-100,my=-100,rx=-100,ry=-100;
-document.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; });
-(function tick(){
-  cursor.style.left = mx-5+'px'; cursor.style.top = my-5+'px';
-  rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
-  ring.style.left = rx-16+'px'; ring.style.top = ry-16+'px';
+let mx = -100, my = -100, rx = -100, ry = -100;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function tick() {
+  cursor.style.left = mx - 5 + 'px';
+  cursor.style.top  = my - 5 + 'px';
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx - 16 + 'px';
+  ring.style.top  = ry - 16 + 'px';
   requestAnimationFrame(tick);
 })();
 
-// ring scale on hover
-document.querySelectorAll('.btn, .github-btn').forEach(el=>{
-  el.addEventListener('mouseenter', ()=>{ ring.style.transform='scale(1.8)'; ring.style.opacity='0.5'; });
-  el.addEventListener('mouseleave', ()=>{ ring.style.transform='scale(1)';   ring.style.opacity='1'; });
+const enlargeRing = () => { ring.style.transform = 'scale(1.8)'; ring.style.opacity = '0.5'; };
+const resetRing   = () => { ring.style.transform = 'scale(1)';   ring.style.opacity = '1'; };
+
+document.querySelectorAll('.github-btn').forEach(el => {
+  el.addEventListener('mouseenter', enlargeRing);
+  el.addEventListener('mouseleave', resetRing);
 });
 
-// PARTICLES
+/* ─── PARTICLES ─── */
 const P = document.getElementById('particles');
-const colors = ['#c8f135','#7c6ff7','#e8547a','#ff6b2b','#ffd166'];
-for(let i=0;i<40;i++){
+const COLORS = ['#c8f135','#7c6ff7','#e8547a','#ff6b2b','#ffd166'];
+for (let i = 0; i < 40; i++) {
   const d = document.createElement('div');
-  d.className='p-dot';
-  const s = Math.random()*3+1.2;
-  const c = colors[Math.floor(Math.random()*colors.length)];
-  d.style.cssText=`
-    width:${s}px;height:${s}px;
-    background:${c}; box-shadow:0 0 6px ${c};
-    left:${Math.random()*100}%;
-    bottom:${Math.random()*20-10}%;
-    animation-duration:${7+Math.random()*12}s;
-    animation-delay:${Math.random()*10}s;
-  `;
+  d.className = 'p-dot';
+  const s = Math.random() * 3 + 1.2;
+  const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+  d.style.cssText = `width:${s}px;height:${s}px;background:${c};box-shadow:0 0 6px ${c};left:${Math.random()*100}%;bottom:${Math.random()*20-10}%;animation-duration:${7+Math.random()*12}s;animation-delay:${Math.random()*10}s;`;
   P.appendChild(d);
 }
 
-// DRAWKI bubble on hover
-document.getElementById('drawkiBtn').addEventListener('mouseenter', function(e){
-  const b = document.createElement('div');
-  b.style.cssText='position:absolute;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;animation:bPop 0.6s ease-out forwards;';
-  const r = this.getBoundingClientRect();
-  const sz = 60;
-  b.style.width=b.style.height=sz+'px';
-  b.style.left=e.clientX-r.left-sz/2+'px';
-  b.style.top=e.clientY-r.top-sz/2+'px';
-  const style=document.createElement('style');
-  style.textContent='@keyframes bPop{0%{transform:scale(0);opacity:1}100%{transform:scale(4);opacity:0}}';
-  document.head.appendChild(style);
-  this.appendChild(b);
-  setTimeout(()=>b.remove(),700);
+/* ══════════════════════════════════════════════
+   DOCK — macOS spring magnification
+══════════════════════════════════════════════ */
+const DOCK_ITEMS = [
+  {
+    label: 'Flowly Notes',
+    href: 'Flowlynotes.html',
+    dotColor: '#c8f135',
+    bg: 'rgba(200,241,53,0.10)',
+    icon: `<svg width="26" height="26" viewBox="0 0 22 22" fill="none">
+      <circle cx="4" cy="11" r="2.5" stroke="#c8f135" stroke-width="1.5"/>
+      <circle cx="18" cy="5" r="2.5" stroke="#c8f135" stroke-width="1.5"/>
+      <circle cx="18" cy="17" r="2.5" stroke="#c8f135" stroke-width="1.5"/>
+      <circle cx="11" cy="11" r="2.5" stroke="#c8f135" stroke-width="1.5"/>
+      <line x1="6.5" y1="11" x2="8.5" y2="11" stroke="#c8f135" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="13.5" y1="11" x2="15.5" y2="7" stroke="#c8f135" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="13.5" y1="11" x2="15.5" y2="15" stroke="#c8f135" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>`
+  },
+  {
+    label: 'DrawkiBoard',
+    href: 'Drawkiboard.html',
+    dotColor: '#7c6ff7',
+    bg: 'rgba(124,111,247,0.10)',
+    icon: `<svg width="26" height="26" viewBox="0 0 22 22" fill="none">
+      <rect x="3" y="13" width="8" height="6" rx="1.5" stroke="#7c6ff7" stroke-width="1.5"/>
+      <ellipse cx="16" cy="7" rx="4" ry="4" stroke="#7c6ff7" stroke-width="1.5"/>
+      <line x1="9" y1="3" x2="13" y2="7" stroke="#7c6ff7" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2"/>
+    </svg>`
+  },
+  {
+    label: 'Tempo',
+    href: 'stopwatch.html',
+    dotColor: '#ff6b2b',
+    bg: 'rgba(255,107,43,0.10)',
+    icon: `<svg width="26" height="26" viewBox="0 0 22 22" fill="none">
+      <circle cx="11" cy="12" r="8" stroke="#ff6b2b" stroke-width="1.5"/>
+      <rect x="9" y="2" width="4" height="2.5" rx="1" stroke="#ff6b2b" stroke-width="1.5"/>
+      <line x1="11" y1="12" x2="11" y2="6.5" stroke="#ff6b2b" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="12" x2="14.5" y2="14.5" stroke="#ff6b2b" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="11" cy="12" r="1.2" fill="#ff6b2b"/>
+    </svg>`
+  },
+  { sep: true },
+  {
+    label: 'GitHub',
+    href: 'https://github.com/Atromost/Flowly-Notes',
+    external: true,
+    dotColor: 'rgba(255,255,255,0.4)',
+    bg: 'rgba(255,255,255,0.05)',
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(255,255,255,0.55)">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+    </svg>`
+  }
+];
+
+/* Physics constants */
+const BASE      = 48;
+const MAG       = 82;
+const DISTANCE  = 180;
+const STIFFNESS = 0.20;
+const DAMPING   = 0.68;
+
+const panel = document.getElementById('dockPanel');
+const realItems = [];
+
+DOCK_ITEMS.forEach(item => {
+  if (item.sep) {
+    const sep = document.createElement('div');
+    sep.className = 'dock-sep';
+    panel.appendChild(sep);
+    return;
+  }
+  const el = document.createElement('a');
+  el.className = 'dock-item';
+  el.href = item.href;
+  if (item.external) el.target = '_blank';
+  el.style.background = item.bg;
+  el.innerHTML = `
+    ${item.icon}
+    <div class="dock-label">${item.label}</div>
+    <div class="dock-dot" style="background:${item.dotColor};"></div>
+  `;
+  panel.appendChild(el);
+  el.addEventListener('mouseenter', enlargeRing);
+  el.addEventListener('mouseleave', resetRing);
+  realItems.push({ el, spring: { pos: BASE, vel: 0 } });
 });
+
+let dockMouseX = null;
+panel.addEventListener('mousemove', e => { dockMouseX = e.clientX; });
+panel.addEventListener('mouseleave', () => { dockMouseX = null; });
+
+function getTarget(el) {
+  if (dockMouseX === null) return BASE;
+  const r    = el.getBoundingClientRect();
+  const mid  = r.left + r.width / 2;
+  const dist = Math.abs(dockMouseX - mid);
+  if (dist >= DISTANCE) return BASE;
+  const t = 1 - dist / DISTANCE;
+  return BASE + (MAG - BASE) * t * t;
+}
+
+(function dockTick() {
+  realItems.forEach(({ el, spring }) => {
+    const target = getTarget(el);
+    const force  = (target - spring.pos) * STIFFNESS;
+    spring.vel   = (spring.vel + force) * DAMPING;
+    spring.pos  += spring.vel;
+    const sz = Math.max(BASE, spring.pos);
+    el.style.width        = sz + 'px';
+    el.style.height       = sz + 'px';
+    el.style.borderRadius = Math.round(sz * 0.215) + 'px';
+    const svgEl = el.querySelector('svg');
+    if (svgEl) {
+      const iconSz = Math.round(26 * (sz / BASE));
+      svgEl.setAttribute('width',  Math.min(iconSz, 40));
+      svgEl.setAttribute('height', Math.min(iconSz, 40));
+    }
+  });
+  requestAnimationFrame(dockTick);
+})();
 </script>
 </body>
 </html>
