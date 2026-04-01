@@ -6,6 +6,31 @@
 <title>WikiUse</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
+
+#cats {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 10px;
+  padding: 8px 0;
+
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+
+  /* 🔥 IMPORTANT */
+  width: 100%;
+}
+
+#cats::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: 0 0 auto;   /* 🔥 main fix */
+  white-space: nowrap;
+  padding: 6px 14px;
+}
+
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
@@ -591,19 +616,27 @@ body {
     <div class="reader-body" id="rbody"></div>
   </div>
 </div>
-
 <script>
-const KEY = "66f330c48c3350c80ac880ebd8e29387";
-
 const CATS = [
-  { name: 'Top News',   topic: 'breaking-news' },
-  { name: 'Tech',       topic: 'technology' },
-  { name: 'Science',    topic: 'science' },
-  { name: 'World',      topic: 'world' },
-  { name: 'Business',   topic: 'business' },
-  { name: 'Sports',     topic: 'sports' },
-  { name: 'Health',     topic: 'health' },
-  { name: 'Nation',     topic: 'nation' },
+  { name: 'Top News' },
+  { name: 'Tech' },
+  { name: 'Science' },
+  { name: 'World' },
+  { name: 'Business' },
+  { name: 'Sports' },
+  { name: 'Health' },
+  { name: 'Nation' },
+];
+
+const RSS = [
+  "https://feeds.bbci.co.uk/news/rss.xml",
+  "https://feeds.bbci.co.uk/news/technology/rss.xml",
+  "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
+  "https://feeds.bbci.co.uk/news/world/rss.xml",
+  "https://feeds.bbci.co.uk/news/business/rss.xml",
+  "https://feeds.bbci.co.uk/sport/rss.xml",
+  "https://feeds.bbci.co.uk/news/health/rss.xml",
+  "https://feeds.bbci.co.uk/news/uk/rss.xml"
 ];
 
 let cur = 0, arts = [];
@@ -618,15 +651,30 @@ document.getElementById('datestr').textContent =
 function buildTabs() {
   const el = document.getElementById('cats');
   el.innerHTML = '';
+
   CATS.forEach((c, i) => {
     const b = document.createElement('button');
     b.className = 'tab' + (i === cur ? ' on' : '');
     b.textContent = c.name;
-    b.onclick = () => { cur = i; buildTabs(); load(); };
+
+    b.onclick = () => {
+      cur = i;
+      buildTabs();
+      load();
+
+      setTimeout(() => {
+        b.scrollIntoView({
+          behavior: "smooth",
+          inline: "center"
+        });
+      }, 50);
+    };
+
     el.appendChild(b);
   });
 }
 
+/* TIME */
 function ago(str) {
   const m = Math.floor((Date.now() - new Date(str)) / 60000);
   if (m < 1) return 'Just now';
@@ -635,119 +683,187 @@ function ago(str) {
   return Math.floor(m / 1440) + 'd ago';
 }
 
+/* CLEAN HTML */
+function cleanHTML(html) {
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.textContent || "";
+}
+
 /* SKELETON */
 function showSkeleton() {
-  const feed = document.getElementById('feed');
-  let h = `<div class="loading">
-    <div class="skel" style="height:260px;margin-top:28px;border-radius:4px;"></div>
-    <div class="skel" style="height:20px;width:40%;margin-top:28px;"></div>
-    <div class="skel" style="height:16px;width:90%;margin-top:12px;"></div>
-    <div class="skel" style="height:16px;width:75%;margin-top:8px;"></div>`;
-  for (let i = 0; i < 5; i++) {
-    h += `<div style="display:flex;gap:16px;margin-top:20px;align-items:flex-start">
-      <div class="skel" style="width:24px;height:14px;flex-shrink:0;margin-top:4px;"></div>
-      <div style="flex:1">
-        <div class="skel" style="height:12px;width:30%;margin-bottom:8px;"></div>
-        <div class="skel" style="height:16px;width:95%;margin-bottom:6px;"></div>
-        <div class="skel" style="height:16px;width:70%;margin-bottom:6px;"></div>
-        <div class="skel" style="height:11px;width:20%;"></div>
-      </div>
-      <div class="skel" style="width:72px;height:54px;flex-shrink:0;border-radius:3px;"></div>
-    </div>`;
-  }
-  h += '</div>';
-  feed.innerHTML = h;
+  document.getElementById('feed').innerHTML =
+    '<div class="loading">Loading fresh news...</div>';
 }
 
 /* LOAD */
 async function load() {
   showSkeleton();
+
   try {
-    const realUrl = `https://gnews.io/api/v4/top-headlines?topic=${CATS[cur].topic}&lang=en&max=20&apikey=${KEY}`;
-    const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(realUrl)}`;
-    const r = await fetch(url);
-    const data = await r.json();
-    if (!data.articles) throw new Error('No articles found');
-    arts = data.articles.map(a => ({
-      title: a.title,
-      description: a.description,
-      content: a.content,
-      url: a.url,
-      urlToImage: a.image,
-      publishedAt: a.publishedAt,
-      source: { name: a.source?.name || '' },
-    }));
-    if (!arts.length) throw new Error('No articles found');
+    const url =
+      "https://api.rss2json.com/v1/api.json?rss_url=" +
+      encodeURIComponent(RSS[cur]) +
+      "&_=" + Math.random();
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data.items || !data.items.length) throw new Error("No data");
+
+    arts = data.items
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 20)
+      .map(item => {
+        const desc = cleanHTML(item.description || "");
+        const full = cleanHTML(item.content || item.description || "");
+
+        return {
+          title: item.title,
+          description: desc,
+          full: full,
+          url: item.link,
+          urlToImage: item.thumbnail || "",
+          publishedAt: item.pubDate,
+          source: { name: item.author || "BBC News" }
+        };
+      });
+
     render();
+
   } catch (e) {
-    document.getElementById('feed').innerHTML = `
-      <div class="err-state">
-        <p>${e.message}</p>
-        <button class="btn-retry" onclick="load()">Try Again</button>
-      </div>`;
+    console.error(e);
+    document.getElementById('feed').innerHTML =
+      `<div class="err-state">Failed to load</div>`;
   }
 }
 
 /* RENDER */
 function render() {
   const feed = document.getElementById('feed');
+
+  if (!arts.length) {
+    feed.innerHTML = `<div class="err-state">No data</div>`;
+    return;
+  }
+
   const [top, ...rest] = arts;
 
   let h = `
-    <div class="featured" onclick="openArt(0)">
-      <div class="feat-kicker">Top Story</div>
-      ${top.urlToImage ? `<div class="feat-img-wrap"><img class="feat-img" src="${top.urlToImage}" onerror="this.closest('.feat-img-wrap').remove()"></div>` : ''}
-      <div class="feat-source">${top.source?.name || ''}</div>
-      <div class="feat-title">${top.title}</div>
-      ${top.description ? `<div class="feat-desc">${top.description}</div>` : ''}
-      <div class="feat-meta">
-        <span>${ago(top.publishedAt)}</span>
-        <span class="feat-meta-dot"></span>
-        <span class="read-more">Read Story →</span>
-      </div>
-    </div>
-    <div class="section-label">More Stories</div>`;
+  <div class="featured" onclick="openArt(0)">
+    ${top.urlToImage ? `<div class="feat-img-wrap"><img class="feat-img" src="${top.urlToImage}"></div>` : ''}
+    <div class="feat-source">${top.source.name}</div>
+    <div class="feat-title">${top.title}</div>
+    <div class="feat-desc">${top.description}</div>
+    <div class="feat-meta">${ago(top.publishedAt)}</div>
+  </div>
+  <div class="section-label">More Stories</div>
+  `;
 
   rest.forEach((a, i) => {
-    h += `<div class="row" onclick="openArt(${i + 1})">
-      <div class="row-num">${(i + 1).toString().padStart(2, '0')}</div>
+    h += `
+    <div class="row" onclick="openArt(${i+1})">
+      <div class="row-num">${i+1}</div>
       <div class="row-body">
-        <div class="row-source">${a.source?.name || ''}</div>
+        <div class="row-source">${a.source.name}</div>
         <div class="row-title">${a.title}</div>
         <div class="row-time">${ago(a.publishedAt)}</div>
       </div>
-      ${a.urlToImage ? `<img class="row-thumb" src="${a.urlToImage}" onerror="this.remove()">` : ''}
+      ${a.urlToImage ? `<img class="row-thumb" src="${a.urlToImage}">` : ''}
     </div>`;
   });
 
   feed.innerHTML = h;
 }
 
-/* READER */
+/* OPEN ARTICLE (NO DUPLICATE TEXT) */
 function openArt(i) {
   const a = arts[i];
-  document.getElementById('rlink').href = a.url;
+
+  const link = document.getElementById('rlink');
+  link.href = a.url;
+  link.target = "_blank";
+  link.rel = "noopener";
+
+  // 🔥 1) clean text
+  let raw = (a.full || a.description || "")
+    .replace(/\s+/g, " ")
+    .replace(/(\r\n|\n|\r)/gm, " ")
+    .trim();
+
+  // 🔥 2) split into sentences (robust)
+  let sentences = raw
+    .split(/(?<=[.?!])\s+/)
+    .map(s => s.trim())
+    .filter(s => s.length > 30); // junk remove
+
+  // 🔥 3) strict dedupe (normalized)
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
+  let unique = [];
+  let seen = new Set();
+
+  for (let s of sentences) {
+    const key = norm(s);
+    if (!seen.has(key)) {
+      seen.add(key);
+      unique.push(s);
+    }
+  }
+
+  // 🔥 4) keep ONLY unique sentences (no repeat, no padding)
+  // max 6–8 lines for readability
+  let picked = unique.slice(0, 8);
+
+  // अगर बहुत कम है, तो जितना है उतना ही दिखाओ (no fake repeat)
+  let finalText = picked.join(" ");
+
+  // 🔥 5) paragraph format (2–3 sentences per para)
+  let paras = [];
+  for (let i = 0; i < picked.length; i += 2) {
+    paras.push(picked.slice(i, i + 2).join(" "));
+  }
+
+  let paragraphsHTML = paras
+    .map(p => `<p>${p}</p>`)
+    .join("");
+
   document.getElementById('rbody').innerHTML = `
-    <div class="r-source">${a.source?.name || ''}</div>
+    <div class="r-source">${a.source.name}</div>
     <div class="r-title">${a.title}</div>
-    ${a.urlToImage ? `<img class="r-img" src="${a.urlToImage}" onerror="this.remove()">` : ''}
-    <div class="r-desc">${a.description || ''}</div>
+    ${a.urlToImage ? `<img class="r-img" src="${a.urlToImage}">` : ''}
+    <div class="r-content">
+      ${paragraphsHTML || `<p>${finalText}</p>`}
+    </div>
+    <a href="${a.url}" target="_blank" rel="noopener" style="display:block;margin-top:12px">
+      Read full article →
+    </a>
   `;
+
   document.getElementById('rbg').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
+/* CLOSE */
 function closeR() {
   document.getElementById('rbg').classList.remove('open');
   document.body.style.overflow = '';
 }
 
+/* BACKGROUND CLICK */
 function handleBgClick(e) {
-  if (e.target === document.getElementById('rbg')) closeR();
+  const panel = document.getElementById('rpanel');
+  if (panel.contains(e.target)) return;
+  closeR();
 }
 
-buildTabs();
-load();
+/* INIT */
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById('rpanel').addEventListener('click', e => {
+    e.stopPropagation();
+  });
+
+  buildTabs();
+  load();
+});
 </script>
 </body>
 </html>
