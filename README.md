@@ -10,15 +10,7 @@
 ## Main GUI.
 
 For the best visual representation of the workspace, focus on these key views:
-<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/cdf7b6ff-e6ab-4639-bb6b-3abd80226bf7" />
-
-
-
-
-* **FlowlyNotes:** A wide shot showing multiple node types (Notes, Todos, Images) connected via yellow bezier curves.
-* **DrawkiBoardr:** A basic, simple user interface for a whiteboard is also included..
-* **Tempo::** A stopwatch featuring a simple and distinctive design is included.
-* **Comming Soon!** 
+<img width="1240" height="556" alt="image" src="https://github.com/user-attachments/assets/23e0c500-440a-4acf-92e4-8ae876246c6d" />
 
 ---
 
@@ -86,3 +78,13 @@ For the best visual representation of the workspace, focus on these key views:
 ---
 ## EasyCV
 **Fastest Resume/Cv Make**
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/002c19e9-1757-419a-83e3-2679275de611" />
+
+---
+## Tempo
+**Asthetic StopWatch**
+* Live Wallpaper Supported
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/2240ff38-02a8-4067-b82d-ba87152b517c" />
+
+---
+> **Note:** Drawkiboard and Flowynotes use hardware acceleration to ensure smoother performance.
