@@ -1,4 +1,4 @@
-# 🌌 DrawkiFlow -Your Tools One Place.
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/cdf7b6ff-e6ab-4639-bb6b-3abd80226bf7" /># 🌌 DrawkiFlow -Your Tools One Place.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.0.0-blueviolet.svg)]()
@@ -10,7 +10,8 @@
 ## Main GUI.
 
 For the best visual representation of the workspace, focus on these key views:
-<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/0287c742-6b69-421c-9afa-e988fcd9e3eb" />
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/9eb5d735-225c-4c2d-863c-4841c2cb4fa1" />
+
 
 
 
@@ -28,29 +29,7 @@ For the best visual representation of the workspace, focus on these key views:
 * **No Login required**
 
 ## FlowlyNotes
-<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/1ae9adab-67fe-4c5e-aecb-7d6383e13a20" />
-
-### 🗂️ Specialized Nodes(FlowlyNotes)
-| Node | Type | Description |
-| :--- | :--- | :--- |
-| 📝 | **Note** | Rich-text editing with a floating formatting bar. |
-| ✅ | **Todo** | Task lists with a real-time progress bar. |
-| 🖼️ | **Image** | High-performance image hosting with captioning. |
-| 🔗 | **Embed** | Live, interactive web content (YouTube/Spotify). |
-| 📌 | **Sticky** | High-speed brainstorming and organizational titling. |
-
----
-
-## ⌨️ Shortcuts for Flowly Notes
-
-| Key | Action |
-| :--- | :--- |
-| `Space` + `Drag` | Pan through the canvas |
-| `V` / `H` / `C` / `D` | Tools: Select, Pan, Connect, Draw |
-| `N` / `T` / `I` / `E` | New: Note, Todo, Image, Embed |
-| `Ctrl` + `.` | Toggle Focus/Presentation Mode |
-| `F` | Fit all nodes to screen |
-| `Ctrl` + `V` | Paste text, nodes, or images |
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/4e4c4c07-562d-48ca-9e43-ddea491bd3fd" />
 
 ---
 
@@ -66,11 +45,44 @@ For the best visual representation of the workspace, focus on these key views:
 
 ---
 ## Nexus 🛠
+* **Unit Converter**
+* **Pass Words Generators**
+* **Json Tools**
+* **Encode:** Url Encode,Caesar
+* **Color Tools:** Color Picker,Palette Generator,Gradient Builder,Contrast Checker
+* **Text Tools:** Analyzer,Transform,Find & Replace,Lorem Generator
+* **Timer & Clock:** World Clock,Stopwatch,Countdown Timer
+* **Quick Notes**
+* **Image Tools *Basic **
+* **Mose Code:** Text to Mose,Mose To Text
+<img width="1366" height="726" alt="image" src="https://github.com/user-attachments/assets/7c5ac26e-d316-4bc8-ac09-7d913796893c" />
+
 ---
 ## WikiUse 📰
+* **Quick News**
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/a944e3ac-f4d0-4bea-880f-df11b8d5cca3" />
+
 ---
 ## AnZen 💳
+* **Easy To Use Flash Card**
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/aef3cd92-12cb-48e0-826a-7e812d7382ec" />
+
 ---
 ## GigaPDF 📄
-> **Note:** Flowly Notes and Drawkiboard uses hardware acceleration for smooth panning across large canvases.
+**Edit**
+* *Merge Pdf*
+* *Split Pdf*
+* *Reorder Pages*
+* *Delete Pages*
+**Convert**
+* *Image To Pdf*
+* *Extract Text*
+* *Extract Image*
+**Security**
+* *Password Protecter*
+* *Add Watermark*
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/b09ec4e4-5248-40ac-8101-b411edb041b4" />
 
+---
+## EasyCV
+**Fastest Resume/Cv Make**
