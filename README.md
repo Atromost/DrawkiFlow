@@ -29,12 +29,6 @@ For the best visual representation of the workspace, focus on these key views:
 ### Hover over tools to view their corresponding shortcut keys.
 <img width="1358" height="644" alt="image" src="https://github.com/user-attachments/assets/41785da3-8851-43a7-a5d0-798635c5b31f" />
 
-## Tempo
-
-* **Custom Live Wallpaper supported**
-* **Simple User interface**
-<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/98ed0822-dd69-43af-bee6-e37a8b9b65d6" />
-
 ---
 ## Nexus 🛠
 * **Unit Converter**
