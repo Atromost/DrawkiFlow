@@ -1,4 +1,4 @@
-<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/cdf7b6ff-e6ab-4639-bb6b-3abd80226bf7" /># 🌌 DrawkiFlow -Your Tools One Place.
+# 🌌 DrawkiFlow -Your Tools One Place.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.0.0-blueviolet.svg)]()
@@ -10,7 +10,7 @@
 ## Main GUI.
 
 For the best visual representation of the workspace, focus on these key views:
-<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/9eb5d735-225c-4c2d-863c-4841c2cb4fa1" />
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/cdf7b6ff-e6ab-4639-bb6b-3abd80226bf7" />
 
 
 
