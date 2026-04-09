@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Planner & PDF Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts for Print Customization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Exact A4 Dimensions & Printable Layout Styles */
+        :root {
+            --primary-color: #475569;
+            --secondary-color: #94a3b8;
+            --accent-color: #cbd5e1;
+            --text-color: #1e293b;
+            --font-family: 'Inter', sans-serif;
+            --grid-density: 8px;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: #f1f5f9;
+        }
+
+        /* Print Specifics - Ensure strict A4 output */
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+
+        /* The Printable Sheet Layout */
+        .a4-sheet {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            color: var(--text-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transform-origin: top center;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            padding: 12mm;
+        }
+
+        /* Hide everything except A4 Sheet during Print */
+        @media print {
+            body {
+                background: white !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .a4-sheet {
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                transform: scale(1) !important;
+            }
+        }
+
+        /* Custom Checkbox/Input styling inside the printable area */
+        .print-input {
+            border: none;
+            border-bottom: 1px dashed var(--accent-color);
+            background: transparent;
+            width: 100%;
+            outline: none;
+            font-family: inherit;
+            color: inherit;
+        }
+        
+        /* Thin borders for clean print design */
+        .planner-border {
+            border: 1px solid var(--accent-color);
+        }
+        .planner-border-b {
+            border-bottom: 1px solid var(--accent-color);
+        }
+        .planner-border-r {
+            border-right: 1px solid var(--accent-color);
+        }
+
+        /* Material UI scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden antialiased text-slate-800">
+
+    <!-- SIDEBAR / CUSTOMIZATION PANEL (No Print) -->
+    <aside class="w-96 bg-white border-r border-slate-200 flex flex-col h-full shadow-sm z-10 no-print">
+        <!-- Header -->
+        <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+            <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+            </svg>
+            <div>
+                <h1 class="text-lg font-semibold text-slate-800 leading-tight">Planner Studio</h1>
+                <p class="text-xs text-slate-500">Perfectly aligned, print-ready PDFs</p>
+            </div>
+        </div>
+
+        <!-- Customization Controls -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+
+            <!-- 1. Template Selection -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Planner Template</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="setTemplate('yearly')" id="btn-yearly" class="template-btn flex flex-col items-start p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition duration-150 text-left">
+                        <svg class="w-5 h-5 text-slate-600 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 16.5" />
+                        </svg>
+                        <span class="text-sm font-medium text-slate-700">Yearly</span>
+                        <span class="text-xs text-slate-400 mt-0.5">12-Month Overview</span>
+                    </button>
+
+                    <button onclick="setTemplate('monthly')" id="btn-monthly" class="template-btn flex flex-col items-start p-3 rounded-xl border border-slate-200 hover:bg-slate-50 transition duration-150 text-left">
+                        <svg class="w-5 h-5 text-slate-600 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h1.5M20.25 6A2.25 2.25 0 0018 3.75h-1.5M3.75 18A2.25 2.25 0 006 20.25h1.5M20.25 18A2.25 2.25 0 0118 20.25h-1.5M6.75 6.75h10.5v10.5H6.75V6.75z" />
+                        </svg>
+                        <span class="text-sm font-medium text-slate-700">Monthly</span>
+                        <span class="text-xs text-slate-400 mt-0.5">Grid & Habits</span>
+                    </button>
+
+                    <button onclick="setTemplate('weekly')" id="btn-weekly" class="template-btn flex flex-col items-start p-3 rounded-xl border border-slate-200 hover:bg-slate-50 transition duration-150 text-left">
+                        <svg class="w-5 h-5 text-slate-600 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.5-6h15" />
+                        </svg>
+                        <span class="text-sm font-medium text-slate-700">Weekly</span>
+                        <span class="text-xs text-slate-400 mt-0.5">Mon–Sun Focus</span>
+                    </button>
+
+                    <button onclick="setTemplate('daily')" id="btn-daily" class="template-btn flex flex-col items-start p-3 rounded-xl border border-slate-200 hover:bg-slate-50 transition duration-150 text-left">
+                        <svg class="w-5 h-5 text-slate-600 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="text-sm font-medium text-slate-700">Daily</span>
+                        <span class="text-xs text-slate-400 mt-0.5">Hourly Schedule</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. Planner Meta & Title -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Planner Title</label>
+                <input type="text" id="planner-title" value="My Planner 2026" oninput="updatePreview()" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300 focus:bg-white transition" />
+            </div>
+
+            <!-- 3. Layout Options (Toggles) -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Sections & Density</label>
+                <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <label class="flex items-center justify-between cursor-pointer">
+                        <span class="text-sm text-slate-600">Show Notes Area</span>
+                        <input type="checkbox" id="toggle-notes" checked onchange="updatePreview()" class="w-4 h-4 text-slate-600 rounded border-slate-300 focus:ring-slate-500" />
+                    </label>
+                    <label class="flex items-center justify-between cursor-pointer">
+                        <span class="text-sm text-slate-600">Show Goals / Priorities</span>
+                        <input type="checkbox" id="toggle-goals" checked onchange="updatePreview()" class="w-4 h-4 text-slate-600 rounded border-slate-300 focus:ring-slate-500" />
+                    </label>
+                    <label class="flex items-center justify-between cursor-pointer">
+                        <span class="text-sm text-slate-600">Show Habit Tracker</span>
+                        <input type="checkbox" id="toggle-habits" checked onchange="updatePreview()" class="w-4 h-4 text-slate-600 rounded border-slate-300 focus:ring-slate-500" />
+                    </label>
+                    <div class="pt-2 border-t border-slate-200">
+                        <label class="block text-xs text-slate-500 mb-1">Row/Grid Spacing Density</label>
+                        <select id="select-density" onchange="applyDensity()" class="w-full text-sm bg-white border border-slate-200 rounded-lg px-3 py-2 outline-none">
+                            <option value="8px">Spacious (8px)</option>
+                            <option value="6px">Standard (6px)</option>
+                            <option value="4px">Compact (4px)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Typography & Styling -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Typography & Styling</label>
+                <div class="space-y-3">
+                    <div>
+                        <span class="text-xs text-slate-500 block mb-1">Font Family</span>
+                        <select id="select-font" onchange="applyTheme()" class="w-full text-sm bg-white border border-slate-200 rounded-lg px-3 py-2 outline-none">
+                            <option value="'Inter', sans-serif">Inter (Clean / Modern)</option>
+                            <option value="'Playfair Display', serif">Playfair Display (Elegant)</option>
+                            <option value="'Roboto Mono', monospace">Roboto Mono (Technical)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <span class="text-xs text-slate-500 block mb-1">Color Palette (Print Safe)</span>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="setColorTheme('#475569', '#94a3b8', '#cbd5e1')" class="h-8 rounded-lg border border-slate-200 bg-slate-600 flex items-center justify-center">
+                                <span class="w-2 h-2 rounded-full bg-white"></span>
+                            </button>
+                            <button onclick="setColorTheme('#115e59', '#14b8a6', '#ccfbf1')" class="h-8 rounded-lg border border-slate-200 bg-teal-800"></button>
+                            <button onclick="setColorTheme('#9f1239', '#fb7185', '#ffe4e6')" class="h-8 rounded-lg border border-slate-200 bg-rose-800"></button>
+                            <button onclick="setColorTheme('#1e3a8a', '#3b82f6', '#dbeafe')" class="h-8 rounded-lg border border-slate-200 bg-blue-800"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Print & Export Footer Actions -->
+        <div class="p-6 border-t border-slate-100 space-y-3 bg-slate-50/50">
+            <button onclick="printPDF()" class="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 px-4 rounded-xl shadow-sm transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
+                </svg>
+                <span>Print & Save PDF</span>
+            </button>
+            <div class="text-center text-xs text-slate-400">
+                Print securely via native browser PDF rendering.
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN PREVIEW AREA -->
+    <main class="flex-1 flex flex-col h-full bg-slate-100/60 overflow-hidden">
+        
+        <!-- Top Control Bar (Zoom & Quality) -->
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-10 no-print flex-shrink-0">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+                <span class="text-sm font-medium text-slate-600">Print Preview (A4 Size)</span>
+            </div>
+
+            <!-- Zoom Controls -->
+            <div class="flex items-center gap-4 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+                <span class="text-xs text-slate-400 font-medium">Zoom</span>
+                <input type="range" id="zoom-slider" min="50" max="100" step="10" value="80" oninput="applyZoom()" class="w-28 accent-slate-600" />
+                <span id="zoom-value" class="text-xs font-semibold text-slate-600 w-10 text-right">80%</span>
+            </div>
+        </header>
+
+        <!-- Centered A4 Canvas / Container -->
+        <section class="flex-1 overflow-auto flex items-start justify-center p-8">
+            <!-- Printable A4 View -->
+            <div class="a4-sheet" id="planner-sheet">
+                <!-- Rendered planner content gets dynamically injected here -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Global State & Data
+        let currentTemplate = 'yearly';
+        let currentColors = {
+            primary: '#475569',
+            secondary: '#94a3b8',
+            accent: '#cbd5e1'
+        };
+
+        // DOM elements
+        const plannerSheet = document.getElementById('planner-sheet');
+        const zoomSlider = document.getElementById('zoom-slider');
+        const zoomValue = document.getElementById('zoom-value');
+
+        // Main Render Controller
+        function updatePreview() {
+            const title = document.getElementById('planner-title').value || 'My Planner';
+            const showNotes = document.getElementById('toggle-notes').checked;
+            const showGoals = document.getElementById('toggle-goals').checked;
+            const showHabits = document.getElementById('toggle-habits').checked;
+
+            // Generate HTML structure based on template type
+            let contentHTML = '';
+
+            // Common Print Header Section inside the A4 sheet
+            const headerHTML = `
+                <div class="flex items-end justify-between border-b pb-4 mb-6" style="border-color: var(--accent-color);">
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight" style="color: var(--primary-color);">${title}</h1>
+                        <p class="text-xs mt-1" style="color: var(--secondary-color);">Printable Layout — 210x297mm A4 Standard</p>
+                    </div>
+                    <div class="flex gap-4 text-xs font-medium" style="color: var(--secondary-color);">
+                        <div>Date: <span class="inline-block w-24 border-b border-dashed border-slate-300"></span></div>
+                        <div>Status: <span class="inline-block w-24 border-b border-dashed border-slate-300"></span></div>
+                    </div>
+                </div>
+            `;
+
+            if (currentTemplate === 'yearly') {
+                // 1. YEARLY TEMPLATE
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                contentHTML += headerHTML;
+
+                // Goals / Major Milestones section at the top if enabled
+                if (showGoals) {
+                    contentHTML += `
+                        <div class="mb-6">
+                            <h2 class="text-sm font-semibold uppercase tracking-wider mb-2" style="color: var(--primary-color);">Key Yearly Goals & Milestones</h2>
+                            <div class="grid grid-cols-4 gap-4 planner-border rounded-xl p-3">
+                                ${[1,2,3,4].map(i => `
+                                    <div>
+                                        <span class="text-xs font-medium" style="color: var(--secondary-color);">Q${i} Objective</span>
+                                        <input type="text" placeholder="Goal detail..." class="print-input text-sm mt-1 py-1" />
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // 12-Month grid Overview
+                contentHTML += `
+                    <div class="grid grid-cols-3 gap-4 flex-1">
+                        ${months.map(m => `
+                            <div class="planner-border rounded-xl p-3 flex flex-col justify-between">
+                                <h3 class="text-sm font-bold border-b pb-1 mb-2" style="border-color: var(--accent-color); color: var(--primary-color);">${m}</h3>
+                                <div class="flex-1 flex flex-col justify-between space-y-1">
+                                    <input type="text" placeholder="• Major Event/Task" class="print-input text-xs" />
+                                    <input type="text" placeholder="• " class="print-input text-xs" />
+                                    <input type="text" placeholder="• " class="print-input text-xs" />
+                                    <input type="text" placeholder="• " class="print-input text-xs" />
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Notes section if enabled
+                if (showNotes) {
+                    contentHTML += `
+                        <div class="mt-6 planner-border rounded-xl p-3">
+                            <h3 class="text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--primary-color);">Yearly Reflections & Notes</h3>
+                            <div class="space-y-2">
+                                <div class="border-b border-dashed border-slate-200 h-4"></div>
+                                <div class="border-b border-dashed border-slate-200 h-4"></div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+            } else if (currentTemplate === 'monthly') {
+                // 2. MONTHLY TEMPLATE
+                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+                contentHTML += headerHTML;
+
+                // Main Layout with Sidebar
+                contentHTML += `<div class="flex gap-6 flex-1">`;
+
+                // Left: Large Calendar Grid (5 rows)
+                contentHTML += `<div class="flex-1 flex flex-col">`;
+                
+                // Days header
+                contentHTML += `
+                    <div class="grid grid-cols-7 mb-2">
+                        ${days.map(d => `<div class="text-xs font-semibold text-center py-1" style="color: var(--primary-color);">${d.substring(0,3)}</div>`).join('')}
+                    </div>
+                `;
+
+                // 5x7 Calendar Grid
+                contentHTML += `
+                    <div class="grid grid-cols-7 grid-rows-5 flex-1 planner-border rounded-xl overflow-hidden">
+                        ${Array.from({ length: 35 }).map(() => `
+                            <div class="border-r border-b p-1 flex flex-col justify-between" style="border-color: var(--accent-color);">
+                                <div class="text-xs font-medium text-right pr-1" style="color: var(--secondary-color);">_</div>
+                                <div class="flex-1 mt-2">
+                                    <input type="text" class="print-input text-[10px]" />
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                contentHTML += `</div>`; // End Left Calendar
+
+                // Right: Sidebar for Priorities, Habits, and Notes
+                contentHTML += `<div class="w-56 flex flex-col gap-6">`;
+
+                if (showGoals) {
+                    contentHTML += `
+                        <div class="flex-1 flex flex-col">
+                            <h3 class="text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--primary-color);">Monthly Priorities</h3>
+                            <div class="planner-border rounded-xl p-3 flex-1 flex flex-col justify-between">
+                                ${Array.from({ length: 6 }).map(() => `
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-3 h-3 rounded-full planner-border flex-shrink-0"></div>
+                                        <input type="text" class="print-input text-xs" />
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (showHabits) {
+                    contentHTML += `
+                        <div class="flex-1 flex flex-col">
+                            <h3 class="text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--primary-color);">Habit Tracker</h3>
+                            <div class="planner-border rounded-xl p-3 flex-1 flex flex-col justify-between">
+                                ${Array.from({ length: 4 }).map(() => `
+                                    <div class="flex flex-col gap-1">
+                                        <input type="text" placeholder="Habit / Routine" class="print-input text-[11px] font-medium" />
+                                        <div class="flex justify-between mt-1">
+                                            ${Array.from({ length: 7 }).map(() => `<span class="w-3 h-3 rounded border border-slate-300"></span>`).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (showNotes) {
+                    contentHTML += `
+                        <div class="h-32 planner-border rounded-xl p-3 flex flex-col">
+                            <h3 class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--primary-color);">Notes</h3>
+                            <textarea class="w-full flex-1 resize-none bg-transparent outline-none text-xs" placeholder="Monthly focus or summary..."></textarea>
+                        </div>
+                    `;
+                }
+
+                contentHTML += `</div>`; // End Right Sidebar
+                contentHTML += `</div>`; // End Main Layout
+
+            } else if (currentTemplate === 'weekly') {
+                // 3. WEEKLY TEMPLATE
+                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+                contentHTML += headerHTML;
+
+                if (showGoals) {
+                    contentHTML += `
+                        <div class="mb-6 planner-border rounded-xl p-3">
+                            <h3 class="text-xs font-semibold uppercase tracking-wider mb-2" style="color: var(--primary-color);">Top Priorities for the Week</h3>
+                            <div class="grid grid-cols-3 gap-4">
+                                ${[1,2,3].map(i => `
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-bold" style="color: var(--secondary-color);">${i}.</span>
+                                        <input type="text" class="print-input text-sm" />
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // 7-day Column Grid
+                contentHTML += `
+                    <div class="grid grid-cols-7 gap-3 flex-1 mb-6">
+                        ${days.map(d => `
+                            <div class="planner-border rounded-xl p-3 flex flex-col h-full">
+                                <h3 class="text-sm font-bold border-b pb-2 mb-3 text-center" style="border-color: var(--accent-color); color: var(--primary-color);">${d}</h3>
+                                <div class="flex-1 flex flex-col justify-between space-y-2">
+                                    ${Array.from({ length: 8 }).map(() => `
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="w-2.5 h-2.5 rounded-full border border-slate-300 flex-shrink-0"></span>
+                                            <input type="text" class="print-input text-xs" />
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                if (showNotes) {
+                    contentHTML += `
+                        <div class="planner-border rounded-xl p-3 h-24 flex flex-col">
+                            <h3 class="text-xs font-semibold uppercase tracking-wider mb-1" style="color: var(--primary-color);">Weekly Notes & Follow-ups</h3>
+                            <div class="flex-1 border-b border-dashed border-slate-200 mt-2"></div>
+                            <div class="flex-1 border-b border-dashed border-slate-200"></div>
+                        </div>
+                    `;
+                }
+
+            } else if (currentTemplate === 'daily') {
+                // 4. DAILY TEMPLATE
+                const hours = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'];
+
+                contentHTML += headerHTML;
+
+                contentHTML += `<div class="flex gap-6 flex-1">`;
+
+                // Left Column: Hourly Schedule
+                contentHTML += `
+                    <div class="w-1/2 planner-border rounded-xl p-4 flex flex-col">
+                        <h3 class="text-xs font-bold uppercase tracking-wider mb-4" style="color: var(--primary-color);">Hourly Schedule</h3>
+                        <div class="flex-1 flex flex-col justify-between">
+                            ${hours.map(h => `
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xs font-medium w-10 text-right" style="color: var(--secondary-color);">${h}</span>
+                                    <input type="text" class="print-input text-xs flex-1" />
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+
+                // Right Column: Priorities, Action Items, Notes
+                contentHTML += `<div class="w-1/2 flex flex-col gap-6">`;
+
+                if (showGoals) {
+                    contentHTML += `
+                        <div class="planner-border rounded-xl p-4">
+                            <h3 class="text-xs font-bold uppercase tracking-wider mb-3" style="color: var(--primary-color);">Top 3 Outcomes</h3>
+                            <div class="space-y-3">
+                                ${[1,2,3].map(i => `
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-4 rounded-full text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0" style="background-color: var(--primary-color);">${i}</div>
+                                        <input type="text" class="print-input text-sm" />
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Checklist Task section
+                contentHTML += `
+                    <div class="planner-border rounded-xl p-4 flex-1 flex flex-col">
+                        <h3 class="text-xs font-bold uppercase tracking-wider mb-3" style="color: var(--primary-color);">Action Items & Tasks</h3>
+                        <div class="flex-1 flex flex-col justify-between">
+                            ${Array.from({ length: 8 }).map(() => `
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" class="w-3.5 h-3.5 rounded border border-slate-300" />
+                                    <input type="text" class="print-input text-xs" />
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+
+                if (showNotes) {
+                    contentHTML += `
+                        <div class="planner-border rounded-xl p-4 h-32 flex flex-col">
+                            <h3 class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--primary-color);">Daily Reflection / Notes</h3>
+                            <textarea class="w-full flex-1 resize-none bg-transparent outline-none text-xs mt-1" placeholder="Gratitude, notes, reminders..."></textarea>
+                        </div>
+                    `;
+                }
+
+                contentHTML += `</div>`; // End Right Column
+                contentHTML += `</div>`; // End Main Split
+            }
+
+            // Inject the generated template layout into the printable container
+            plannerSheet.innerHTML = contentHTML;
+        }
+
+        // Apply visual themes to print elements
+        function applyTheme() {
+            const selectedFont = document.getElementById('select-font').value;
+            document.documentElement.style.setProperty('--font-family', selectedFont);
+            updatePreview();
+        }
+
+        // Apply grid/row spacing adjustments safely via CSS variable
+        function applyDensity() {
+            const densityVal = document.getElementById('select-density').value;
+            document.documentElement.style.setProperty('--grid-density', densityVal);
+            updatePreview();
+        }
+
+        // Set the active planner template
+        function setTemplate(type) {
+            currentTemplate = type;
+            
+            // Toggle UI active states
+            const templates = ['yearly', 'monthly', 'weekly', 'daily'];
+            templates.forEach(t => {
+                const btn = document.getElementById(`btn-${t}`);
+                if (t === type) {
+                    btn.classList.add('bg-slate-100', 'border-slate-400');
+                    btn.classList.remove('bg-slate-50', 'border-slate-200');
+                } else {
+                    btn.classList.remove('bg-slate-100', 'border-slate-400');
+                    btn.classList.add('bg-slate-50', 'border-slate-200');
+                }
+            });
+
+            updatePreview();
+        }
+
+        // Update Theme Colors dynamically
+        function setColorTheme(primary, secondary, accent) {
+            currentColors = { primary, secondary, accent };
+            document.documentElement.style.setProperty('--primary-color', primary);
+            document.documentElement.style.setProperty('--secondary-color', secondary);
+            document.documentElement.style.setProperty('--accent-color', accent);
+        }
+
+        // Zoom controller for Preview Scaling
+        function applyZoom() {
+            const zoomVal = zoomSlider.value;
+            zoomValue.innerText = `${zoomVal}%`;
+
+            // We use transform scale for precise A4 zoom previewing without altering print output
+            const scale = zoomVal / 100;
+            plannerSheet.style.transform = `scale(${scale})`;
+        }
+
+        // Standard PDF trigger via Print Dialog (as specified)
+        function printPDF() {
+            // Guarantee pure print styles apply cleanly before print dialog triggers
+            window.print();
+        }
+
+        // Initial setup and render
+        setTemplate('yearly');
+        applyZoom();
+
+    </script>
+</body>
+</html>
