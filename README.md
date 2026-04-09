@@ -1,10 +1,10 @@
-# 🌌 Xomic Tools-Your Tools One Place.
+# 🌌 Tantrix-Your Tools One Place.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.0.0-blueviolet.svg)]()
 [![Style](https://img.shields.io/badge/aesthetic-Dark%20Neon-cyan.svg)]()
 
-**Xomic Tools** unifies productivity tools in one evolving platform, adding new features continuously. Built with an indie vision, *it prioritizes simplicity, efficiency, and strong user privacy*.
+**Tantrix** unifies productivity tools in one evolving platform, adding new features continuously. Built with an indie vision, *it prioritizes simplicity, efficiency, and strong user privacy*.
 ---
 
 ## Main GUI.
