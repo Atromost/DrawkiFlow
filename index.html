@@ -172,7 +172,7 @@ body.clicking #cur-dot { transform: translate(-50%,-50%) scale(2); background: v
   width: 40px; height: 1.5px; background: var(--ink); margin: 12px auto 0; opacity: 0.2;
 }
 
-/* APP GRID — 11 apps */
+/* APP GRID — 12 apps */
 .app-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(100px, 148px));
@@ -265,7 +265,7 @@ body.clicking #cur-dot { transform: translate(-50%,-50%) scale(2); background: v
 .loader-bar-bg { width: 180px; height: 2px; background: var(--paper3); border-radius: 2px; overflow: hidden; }
 .loader-bar-fill { height: 100%; width: 0%; background: var(--ink); border-radius: 2px; transition: width .75s cubic-bezier(.65,0,.35,1); }
 
-/* STAGGER — 11 items */
+/* STAGGER — 12 items */
 .stagger-1  { animation-delay: .04s !important; }
 .stagger-2  { animation-delay: .08s !important; }
 .stagger-3  { animation-delay: .12s !important; }
@@ -277,6 +277,7 @@ body.clicking #cur-dot { transform: translate(-50%,-50%) scale(2); background: v
 .stagger-9  { animation-delay: .36s !important; }
 .stagger-10 { animation-delay: .40s !important; }
 .stagger-11 { animation-delay: .44s !important; }
+.stagger-12 { animation-delay: .48s !important; }
 </style>
 </head>
 <body>
@@ -292,7 +293,7 @@ body.clicking #cur-dot { transform: translate(-50%,-50%) scale(2); background: v
     </div>
     Tantrix
   </div>
-  <div class="topbar-status" id="statusText">Ready · 11 apps</div>
+  <div class="topbar-status" id="statusText">Ready · 12 apps</div>
   <div class="topbar-right">
     <div id="clock">--:--:--</div>
     <button id="themeBtn" class="hover-target" title="Toggle theme">☀</button>
@@ -311,7 +312,7 @@ body.clicking #cur-dot { transform: translate(-50%,-50%) scale(2); background: v
   <div class="wordmark">
     <h1>Tan<span>trix</span></h1>
     <div class="wordmark-line"></div>
-    <p>11 apps · Premium Suite</p>
+    <p>12 apps · Premium Suite</p>
   </div>
   <div class="app-grid" id="appGrid"></div>
 </main>
@@ -323,7 +324,7 @@ body.clicking #cur-dot { transform: translate(-50%,-50%) scale(2); background: v
 </div>
 
 <script>
-// APPS ARRAY — includes TODOSIC
+// APPS ARRAY — includes TODOSIC and Decisio flow
 const APPS = [
   { id:'drawkiboard', name:'Drawki',      url:'Drawkiboard.html',
     icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>` },
@@ -347,7 +348,22 @@ const APPS = [
     icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 208 128" fill="none"><rect width="208" height="128" rx="18" fill="currentColor"/><path d="M22 98V30h22l22 28 22-28h22v68H90V64L68 92 46 64v34H22z" fill="var(--paper)"/><path d="M136 98l28-38h-18V30h-20v30h-18l28 38z" fill="var(--paper)"/></svg>` },
   // TODOSIC — todo list app
   { id:'todosic',     name:'TODOSIC',     url:'todosic.html',
-    icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1" stroke-linecap="round"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M9 16h6"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="16" r="1" fill="currentColor" stroke="none"/></svg>` }
+    icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1" stroke-linecap="round"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M9 16h6"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="16" r="1" fill="currentColor" stroke="none"/></svg>` },
+  // Decisio flow — decision making tool for ADHD with brain icon
+  { id:'decisioflow', name:'Decisio flow', url:'decisioflow.html',
+    icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <!-- Brain outline -->
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4a4 4 0 0 0-4 4c0 1.5.5 2.5 1 3.5L8 13c-2 0-3.5 1.5-3.5 3.5S6 20 8 20h8c2 0 3.5-1.5 3.5-3.5S18 13 16 13l-1-1.5c.5-1 1-2 1-3.5a4 4 0 0 0-4-4z"/>
+      <!-- Brain fold lines -->
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 7c0 1 .5 1.5 1 2M15 7c0 1-.5 1.5-1 2"/>
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8 15c0 1 .5 2 1 2.5M16 15c0 1-.5 2-1 2.5"/>
+      <!-- Decision flow arrows -->
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 10 4 8 6 6"/>
+      <path stroke-linecap="round" stroke-linejoin="round" d="M18 10 20 8 18 6"/>
+      <!-- Checkmark node -->
+      <circle cx="12" cy="17" r="2" stroke="currentColor" fill="none"/>
+      <path stroke-linecap="round" stroke-linejoin="round" d="m11 17 1 1 2-2"/>
+    </svg>` }
 ];
 
 const grid = document.getElementById('appGrid');
