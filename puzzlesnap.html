@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>PuzzleSnap — Make your image a puzzle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ---------- Reset / Base ---------- */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #0D0D0D;
+    color: #fff;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    min-height: 100%;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(255, 61, 154, 0.15), transparent 35%),
+      radial-gradient(circle at 88% 22%, rgba(61, 235, 255, 0.13), transparent 38%),
+      radial-gradient(circle at 75% 90%, rgba(255, 217, 61, 0.10), transparent 40%),
+      radial-gradient(circle at 20% 85%, rgba(255, 107, 53, 0.10), transparent 40%);
+    background-attachment: fixed;
+    padding: 24px 16px 60px;
+    position: relative;
+  }
+  /* halftone dots */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 22px 22px;
+    z-index: 0;
+  }
+
+  .display { font-family: 'Bangers', 'Space Grotesk', cursive; letter-spacing: 1.5px; }
+
+  /* ---------- Layout ---------- */
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    text-align: center;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .title-card {
+    display: inline-block;
+    background: #FFD93D;
+    color: #0D0D0D;
+    padding: 14px 36px 10px;
+    border: 3px solid #0D0D0D;
+    border-radius: 14px;
+    box-shadow: 8px 8px 0 #FF3D9A, 8px 8px 0 3px #0D0D0D;
+    transform: rotate(-2deg);
+    position: relative;
+  }
+  .title-card h1 {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2.6rem, 7vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: 3px;
+    text-shadow: 3px 3px 0 #FF3D9A;
+  }
+  .title-card .snap {
+    color: #3DEBFF;
+    -webkit-text-stroke: 2px #0D0D0D;
+    text-shadow: 3px 3px 0 #0D0D0D;
+  }
+  .badge-burst {
+    position: absolute;
+    top: -22px; right: -28px;
+    background: #FF6B35;
+    color: #0D0D0D;
+    border: 3px solid #0D0D0D;
+    padding: 8px 14px;
+    font-family: 'Bangers', cursive;
+    letter-spacing: 1.5px;
+    transform: rotate(12deg);
+    border-radius: 50px;
+    box-shadow: 4px 4px 0 #0D0D0D;
+    font-size: 0.95rem;
+  }
+  .subtitle {
+    margin-top: 18px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+    color: #fff;
+    display: inline-block;
+    background: #0D0D0D;
+    padding: 6px 14px;
+    border: 2px dashed #3DEBFF;
+    border-radius: 8px;
+    transform: rotate(0.8deg);
+  }
+
+  /* ---------- HUD (timer / moves / win bar) ---------- */
+  .hud {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 22px 0 18px;
+  }
+  .hud-chip {
+    background: #0D0D0D;
+    border: 3px solid #fff;
+    padding: 8px 14px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    box-shadow: 4px 4px 0 #FFD93D;
+    transform: rotate(-1deg);
+    min-width: 110px;
+  }
+  .hud-chip.pink { box-shadow: 4px 4px 0 #FF3D9A; transform: rotate(1deg); }
+  .hud-chip.cyan { box-shadow: 4px 4px 0 #3DEBFF; transform: rotate(-0.5deg); }
+  .hud-chip svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .hud-chip .label { font-size: 0.7rem; opacity: 0.7; letter-spacing: 1px; text-transform: uppercase; }
+  .hud-chip .value { font-family: 'Bangers', cursive; font-size: 1.3rem; letter-spacing: 1.5px; line-height: 1; }
+
+  /* ---------- Main board card ---------- */
+  .board-card {
+    background: #fff;
+    border: 3px solid #0D0D0D;
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 10px 10px 0 #FF3D9A, 10px 10px 0 3px #0D0D0D;
+    transform: rotate(-0.6deg);
+    position: relative;
+    margin: 0 auto;
+    max-width: 720px;
+  }
+  .board-card::before {
+    content: "";
+    position: absolute;
+    top: -10px; left: 22px;
+    width: 60px; height: 22px;
+    background: #FFD93D;
+    border: 2px solid #0D0D0D;
+    border-radius: 4px;
+    transform: rotate(-6deg);
+    box-shadow: 2px 2px 0 #0D0D0D;
+  }
+  .board-card::after {
+    content: "";
+    position: absolute;
+    top: -8px; right: 30px;
+    width: 40px; height: 18px;
+    background: #3DEBFF;
+    border: 2px solid #0D0D0D;
+    border-radius: 4px;
+    transform: rotate(8deg);
+    box-shadow: 2px 2px 0 #0D0D0D;
+  }
+
+  /* ---------- Upload (empty state) ---------- */
+  .upload-zone {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border: 4px dashed #0D0D0D;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    cursor: pointer;
+    background: repeating-linear-gradient(
+      45deg,
+      #fffbe6,
+      #fffbe6 14px,
+      #fff 14px,
+      #fff 28px
+    );
+    color: #0D0D0D;
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    transform: scale(1.015);
+    border-color: #FF3D9A;
+    box-shadow: inset 0 0 0 6px rgba(255,61,154,0.15);
+  }
+  .upload-zone.dragover {
+    background: repeating-linear-gradient(45deg, #ffe6f3, #ffe6f3 14px, #fff 14px, #fff 28px);
+  }
+  .upload-icon {
+    width: 90px; height: 90px;
+    background: #FF3D9A;
+    border: 3px solid #0D0D0D;
+    border-radius: 16px;
+    display: grid; place-items: center;
+    box-shadow: 5px 5px 0 #0D0D0D;
+    transform: rotate(-4deg);
+  }
+  .upload-icon svg { width: 50px; height: 50px; color: #fff; }
+  .upload-text {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    letter-spacing: 2px;
+    color: #0D0D0D;
+    text-align: center;
+  }
+  .upload-sub {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+    background: #FFD93D;
+    border: 2px solid #0D0D0D;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transform: rotate(1deg);
+  }
+
+  /* ---------- Puzzle Board ---------- */
+  .puzzle-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #0D0D0D;
+    border: 3px solid #0D0D0D;
+    border-radius: 10px;
+    overflow: hidden;
+    touch-action: none;
+  }
+  .tile {
+    position: absolute;
+    background-repeat: no-repeat;
+    border: 2px solid #0D0D0D;
+    box-sizing: border-box;
+    transition: transform 180ms cubic-bezier(.2,.9,.3,1.4), box-shadow 150ms ease, outline-color 150ms ease;
+    cursor: grab;
+    will-change: transform;
+    outline: 0 solid transparent;
+  }
+  .tile:hover { z-index: 5; box-shadow: 0 0 0 2px #FFD93D, 4px 4px 0 #0D0D0D; }
+  .tile.dragging { cursor: grabbing; z-index: 50; transition: none; box-shadow: 6px 8px 0 rgba(0,0,0,0.6); transform-origin: center; }
+  .tile.selected {
+    z-index: 10;
+    outline: 4px solid #FF3D9A;
+    outline-offset: -4px;
+    box-shadow: 0 0 0 2px #FFD93D inset, 0 0 18px #FF3D9A;
+  }
+  .tile.correct {
+    outline: 3px solid #3DEBFF;
+    outline-offset: -3px;
+  }
+  .tile.swap-pulse { animation: swapPulse 320ms ease; }
+  @keyframes swapPulse {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.4) saturate(1.4); }
+    100% { filter: brightness(1); }
+  }
+
+  /* ---------- Controls ---------- */
+  .controls {
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+  }
+  .control-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .group-label {
+    font-family: 'Bangers', cursive;
+    letter-spacing: 2px;
+    font-size: 0.95rem;
+    color: #FFD93D;
+    background: #0D0D0D;
+    padding: 4px 12px;
+    border: 2px solid #FFD93D;
+    border-radius: 20px;
+    transform: rotate(-2deg);
+  }
+  .btn {
+    font-family: 'Bangers', cursive;
+    letter-spacing: 1.5px;
+    font-size: 1.05rem;
+    padding: 10px 18px;
+    background: #fff;
+    color: #0D0D0D;
+    border: 3px solid #0D0D0D;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #0D0D0D;
+    transition: transform 100ms ease, box-shadow 100ms ease, background 150ms ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+  }
+  .btn svg { width: 18px; height: 18px; }
+  .btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #0D0D0D; }
+  .btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #0D0D0D; }
+  .btn.yellow { background: #FFD93D; }
+  .btn.pink   { background: #FF3D9A; color: #fff; }
+  .btn.cyan   { background: #3DEBFF; }
+  .btn.orange { background: #FF6B35; color: #fff; }
+  .btn.active {
+    background: #0D0D0D;
+    color: #FFD93D;
+    border-color: #FFD93D;
+    box-shadow: 4px 4px 0 #FF3D9A;
+  }
+
+  /* ---------- Win banner ---------- */
+  .win-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13,13,13,0.75);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .win-overlay.show { display: flex; animation: fadeIn 220ms ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .win-card {
+    background: #FFD93D;
+    border: 4px solid #0D0D0D;
+    border-radius: 22px;
+    padding: 30px 36px;
+    text-align: center;
+    box-shadow: 12px 12px 0 #FF3D9A, 12px 12px 0 4px #0D0D0D;
+    transform: rotate(-3deg);
+    animation: pop 500ms cubic-bezier(.2,.9,.3,1.6);
+    max-width: 420px;
+    position: relative;
+  }
+  @keyframes pop {
+    0% { transform: scale(0.4) rotate(-15deg); opacity: 0; }
+    60% { transform: scale(1.08) rotate(2deg); opacity: 1; }
+    100% { transform: scale(1) rotate(-3deg); }
+  }
+  .win-card h2 {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2rem, 7vw, 3.4rem);
+    letter-spacing: 3px;
+    color: #0D0D0D;
+    text-shadow: 4px 4px 0 #FF3D9A;
+    line-height: 1;
+  }
+  .win-stats {
+    margin: 18px 0 22px;
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .win-stat {
+    background: #0D0D0D;
+    color: #FFD93D;
+    border: 3px solid #0D0D0D;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+  }
+  .win-stat .v { font-family: 'Bangers', cursive; font-size: 1.4rem; letter-spacing: 2px; color: #3DEBFF; display: block; }
+  .win-stat .l { font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.8; }
+  .win-burst {
+    position: absolute;
+    top: -25px; right: -25px;
+    background: #FF3D9A;
+    color: #fff;
+    border: 3px solid #0D0D0D;
+    padding: 10px 14px;
+    font-family: 'Bangers', cursive;
+    letter-spacing: 2px;
+    transform: rotate(15deg);
+    border-radius: 50%;
+    box-shadow: 4px 4px 0 #0D0D0D;
+    width: 80px; height: 80px;
+    display: grid; place-items: center;
+    text-align: center;
+    line-height: 1;
+    font-size: 1.1rem;
+  }
+
+  /* ---------- Confetti ---------- */
+  .confetti-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 99;
+  }
+  .confetti {
+    position: absolute;
+    top: -20px;
+    width: 12px;
+    height: 18px;
+    border: 2px solid #0D0D0D;
+    animation: fall linear forwards;
+  }
+  @keyframes fall {
+    to { transform: translateY(110vh) rotate(720deg); }
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 0.8rem;
+    color: #888;
+    letter-spacing: 1px;
+  }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(120%);
+    background: #0D0D0D;
+    color: #FFD93D;
+    border: 3px solid #FFD93D;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-family: 'Bangers', cursive;
+    letter-spacing: 1.5px;
+    z-index: 200;
+    transition: transform 280ms cubic-bezier(.2,.9,.3,1.4);
+    box-shadow: 5px 5px 0 #FF3D9A;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 520px) {
+    body { padding: 14px 10px 50px; }
+    .board-card { padding: 12px; transform: rotate(-0.3deg); box-shadow: 6px 6px 0 #FF3D9A, 6px 6px 0 3px #0D0D0D; }
+    .title-card { padding: 10px 22px 8px; box-shadow: 6px 6px 0 #FF3D9A, 6px 6px 0 3px #0D0D0D; }
+    .badge-burst { right: -10px; top: -16px; font-size: 0.8rem; padding: 6px 10px; }
+    .upload-icon { width: 70px; height: 70px; }
+    .upload-icon svg { width: 38px; height: 38px; }
+    .btn { font-size: 0.95rem; padding: 9px 14px; }
+    .hud-chip { min-width: 96px; padding: 6px 10px; }
+    .hud-chip .value { font-size: 1.1rem; }
+  }
+
+  /* hide native file input */
+  #fileInput { display: none; }
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="title-card">
+      <h1>PUZZLE<span class="snap">SNAP</span></h1>
+      <div class="badge-burst">POW!</div>
+    </div>
+    <div>
+      <p class="subtitle">Make your image a puzzle</p>
+    </div>
+  </header>
+
+  <!-- HUD -->
+  <div class="hud" id="hud" style="display:none;">
+    <div class="hud-chip yellow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#FFD93D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M9 2h6"/></svg>
+      <div>
+        <div class="label">Time</div>
+        <div class="value" id="timerVal">00:00</div>
+      </div>
+    </div>
+    <div class="hud-chip pink">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#FF3D9A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+      <div>
+        <div class="label">Moves</div>
+        <div class="value" id="movesVal">0</div>
+      </div>
+    </div>
+    <div class="hud-chip cyan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#3DEBFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <div>
+        <div class="label">Solved</div>
+        <div class="value" id="solvedVal">0/0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOARD -->
+  <div class="board-card">
+    <!-- Empty state -->
+    <div class="upload-zone" id="uploadZone">
+      <div class="upload-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <div class="upload-text">DROP IMAGE HERE</div>
+      <div class="upload-sub">or click to browse</div>
+    </div>
+
+    <!-- Puzzle Stage (hidden initially) -->
+    <div class="puzzle-stage" id="puzzleStage" style="display:none;"></div>
+
+    <input type="file" id="fileInput" accept="image/*" />
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="control-group">
+      <span class="group-label">Difficulty</span>
+      <button class="btn yellow active" data-diff="3">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 10l3-3 3 3"/></svg>
+        Easy 3×3
+      </button>
+      <button class="btn pink" data-diff="4">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>
+        Medium 4×4
+      </button>
+      <button class="btn orange" data-diff="5">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 9 22 9 17 14 19 22 12 17 5 22 7 14 2 9 9 9 12 2"/></svg>
+        Hard 5×5
+      </button>
+    </div>
+    <div class="control-group">
+      <button class="btn cyan" id="restartBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15A9 9 0 1 0 6 5.3L1 10"/></svg>
+        Restart
+      </button>
+      <button class="btn pink" id="newImgBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        New Image
+      </button>
+      <button class="btn yellow" id="previewBtn" title="Hold to preview original">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Peek
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    <p>PUZZLESNAP — DRAG, SWAP, SOLVE.</p>
+  </footer>
+</div>
+
+<!-- WIN OVERLAY -->
+<div class="win-overlay" id="winOverlay">
+  <div class="win-card">
+    <div class="win-burst">NICE<br/>ONE!</div>
+    <h2>PUZZLE<br/>COMPLETE!</h2>
+    <div class="win-stats">
+      <div class="win-stat"><span class="v" id="winTime">00:00</span><span class="l">Time</span></div>
+      <div class="win-stat"><span class="v" id="winMoves">0</span><span class="l">Moves</span></div>
+    </div>
+    <button class="btn pink" id="winAgainBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15A9 9 0 1 0 6 5.3L1 10"/></svg>
+      Play Again
+    </button>
+  </div>
+</div>
+
+<div class="confetti-container" id="confettiContainer"></div>
+<div class="toast" id="toast">Loaded!</div>
+
+<script>
+(() => {
+  // ============ State ============
+  const state = {
+    img: null,             // HTMLImageElement
+    imgURL: null,
+    grid: 3,               // NxN
+    tiles: [],             // [{correctIdx, currentIdx, el}]
+    boardSize: 0,          // px
+    tileSize: 0,
+    selectedIdx: null,     // currently tapped tile (currentIdx position)
+    moves: 0,
+    timer: 0,
+    timerInt: null,
+    started: false,
+    solved: false,
+    drag: null,            // active drag info
+  };
+
+  // ============ DOM refs ============
+  const $ = (id) => document.getElementById(id);
+  const uploadZone = $('uploadZone');
+  const fileInput = $('fileInput');
+  const stage = $('puzzleStage');
+  const hud = $('hud');
+  const timerVal = $('timerVal');
+  const movesVal = $('movesVal');
+  const solvedVal = $('solvedVal');
+  const winOverlay = $('winOverlay');
+  const winTime = $('winTime');
+  const winMoves = $('winMoves');
+  const confettiContainer = $('confettiContainer');
+  const toast = $('toast');
+
+  // ============ Utility ============
+  const fmtTime = (s) => {
+    const m = Math.floor(s / 60).toString().padStart(2,'0');
+    const ss = (s % 60).toString().padStart(2,'0');
+    return `${m}:${ss}`;
+  };
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  // ============ Upload ============
+  uploadZone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (f) loadFile(f);
+    fileInput.value = '';
+  });
+
+  ['dragenter','dragover'].forEach(ev =>
+    uploadZone.addEventListener(ev, (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); })
+  );
+  ['dragleave','drop'].forEach(ev =>
+    uploadZone.addEventListener(ev, (e) => { e.preventDefault(); uploadZone.classList.remove('dragover'); })
+  );
+  uploadZone.addEventListener('drop', (e) => {
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) loadFile(f);
+  });
+
+  // also accept dropping on entire window
+  window.addEventListener('dragover', (e) => { e.preventDefault(); });
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f && !state.img) loadFile(f);
+  });
+
+  function loadFile(file) {
+    if (!file.type.startsWith('image/')) {
+      showToast('Image files only!');
+      return;
+    }
+    if (state.imgURL) URL.revokeObjectURL(state.imgURL);
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      state.img = img;
+      state.imgURL = url;
+      showToast('Image loaded!');
+      buildPuzzle();
+    };
+    img.onerror = () => { showToast('Could not load image'); };
+    img.src = url;
+  }
+
+  // ============ Build Puzzle ============
+  function buildPuzzle() {
+    state.solved = false;
+    state.moves = 0;
+    state.timer = 0;
+    state.started = false;
+    state.selectedIdx = null;
+    movesVal.textContent = '0';
+    timerVal.textContent = '00:00';
+    solvedVal.textContent = `0/${state.grid * state.grid}`;
+    stopTimer();
+
+    uploadZone.style.display = 'none';
+    stage.style.display = 'block';
+    hud.style.display = 'flex';
+
+    layoutTiles();
+  }
+
+  function measureBoard() {
+    // Stage is responsive; use bounding rect for accurate sizing
+    const rect = stage.getBoundingClientRect();
+    state.boardSize = Math.floor(rect.width);
+    state.tileSize = state.boardSize / state.grid;
+  }
+
+  function layoutTiles() {
+    measureBoard();
+    stage.innerHTML = '';
+    state.tiles = [];
+
+    const N = state.grid;
+    const total = N * N;
+
+    // Build position permutation (currentIdx -> correctIdx)
+    const perm = shuffleSolvable(total);
+
+    const bgSize = `${state.boardSize}px ${state.boardSize}px`;
+
+    for (let currentIdx = 0; currentIdx < total; currentIdx++) {
+      const correctIdx = perm[currentIdx];
+      const el = document.createElement('div');
+      el.className = 'tile';
+      el.style.width = `${state.tileSize}px`;
+      el.style.height = `${state.tileSize}px`;
+      el.style.backgroundImage = `url("${state.imgURL}")`;
+      el.style.backgroundSize = bgSize;
+
+      // Background position based on correctIdx (which slice this tile shows)
+      const cr = Math.floor(correctIdx / N);
+      const cc = correctIdx % N;
+      el.style.backgroundPosition = `-${cc * state.tileSize}px -${cr * state.tileSize}px`;
+
+      // Slight random rotation on the *image inside* would distort; instead rotate via tilt subtle? Keep tile rectangular for clean swap.
+
+      stage.appendChild(el);
+
+      const tile = { correctIdx, currentIdx, el };
+      state.tiles.push(tile);
+
+      bindTileEvents(tile);
+      placeTile(tile, false);
+      updateCorrectMark(tile);
+    }
+    updateSolvedCount();
+  }
+
+  // Generate shuffled positions; ensure not already solved
+  function shuffleSolvable(n) {
+    const arr = Array.from({ length: n }, (_, i) => i);
+    let attempts = 0;
+    do {
+      // Fisher-Yates
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      attempts++;
+    } while (isSolved(arr) && attempts < 5);
+    return arr;
+  }
+  function isSolved(arr) {
+    for (let i = 0; i < arr.length; i++) if (arr[i] !== i) return false;
+    return true;
+  }
+
+  // Place tile at its currentIdx position
+  function placeTile(tile, animate = true) {
+    const N = state.grid;
+    const r = Math.floor(tile.currentIdx / N);
+    const c = tile.currentIdx % N;
+    const x = c * state.tileSize;
+    const y = r * state.tileSize;
+    if (!animate) {
+      tile.el.style.transition = 'none';
+      tile.el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      // force reflow then restore transition
+      void tile.el.offsetWidth;
+      tile.el.style.transition = '';
+    } else {
+      tile.el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    }
+  }
+
+  function updateCorrectMark(tile) {
+    if (tile.correctIdx === tile.currentIdx) tile.el.classList.add('correct');
+    else tile.el.classList.remove('correct');
+  }
+
+  function updateSolvedCount() {
+    const total = state.grid * state.grid;
+    let solved = 0;
+    state.tiles.forEach(t => { if (t.correctIdx === t.currentIdx) solved++; });
+    solvedVal.textContent = `${solved}/${total}`;
+    if (solved === total && !state.solved) {
+      onWin();
+    }
+  }
+
+  // ============ Tile interactions: click-to-swap + drag-to-swap ============
+  function bindTileEvents(tile) {
+    const el = tile.el;
+
+    let pointerDown = null; // {x, y, time, moved, pointerId}
+    const DRAG_THRESHOLD = 6;
+
+    el.addEventListener('pointerdown', (e) => {
+      if (state.solved) return;
+      e.preventDefault();
+      el.setPointerCapture(e.pointerId);
+      pointerDown = { x: e.clientX, y: e.clientY, time: Date.now(), moved: false, pointerId: e.pointerId };
+    });
+
+    el.addEventListener('pointermove', (e) => {
+      if (!pointerDown || pointerDown.pointerId !== e.pointerId) return;
+      const dx = e.clientX - pointerDown.x;
+      const dy = e.clientY - pointerDown.y;
+      if (!pointerDown.moved && (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD)) {
+        // Begin drag
+        pointerDown.moved = true;
+        startDrag(tile, e);
+      }
+      if (pointerDown.moved && state.drag && state.drag.tile === tile) {
+        moveDrag(e);
+      }
+    });
+
+    el.addEventListener('pointerup', (e) => {
+      if (!pointerDown || pointerDown.pointerId !== e.pointerId) return;
+      const wasDrag = pointerDown.moved;
+      try { el.releasePointerCapture(e.pointerId); } catch(_) {}
+      if (wasDrag && state.drag && state.drag.tile === tile) {
+        endDrag(e);
+      } else {
+        // Click-to-select swap
+        handleTap(tile);
+      }
+      pointerDown = null;
+    });
+
+    el.addEventListener('pointercancel', (e) => {
+      if (state.drag && state.drag.tile === tile) {
+        cancelDrag();
+      }
+      pointerDown = null;
+    });
+  }
+
+  function handleTap(tile) {
+    if (state.selectedIdx === null) {
+      state.selectedIdx = tile.currentIdx;
+      tile.el.classList.add('selected');
+      return;
+    }
+    if (state.selectedIdx === tile.currentIdx) {
+      // deselect
+      tile.el.classList.remove('selected');
+      state.selectedIdx = null;
+      return;
+    }
+    const other = state.tiles.find(t => t.currentIdx === state.selectedIdx);
+    if (other) {
+      other.el.classList.remove('selected');
+      swapTiles(other, tile);
+    }
+    state.selectedIdx = null;
+  }
+
+  // ----- Drag mechanics -----
+  function startDrag(tile, e) {
+    // clear any selection visual
+    if (state.selectedIdx !== null) {
+      const sel = state.tiles.find(t => t.currentIdx === state.selectedIdx);
+      if (sel) sel.el.classList.remove('selected');
+      state.selectedIdx = null;
+    }
+    const stageRect = stage.getBoundingClientRect();
+    const N = state.grid;
+    const r = Math.floor(tile.currentIdx / N);
+    const c = tile.currentIdx % N;
+    const baseX = c * state.tileSize;
+    const baseY = r * state.tileSize;
+    const tileLeft = stageRect.left + baseX;
+    const tileTop = stageRect.top + baseY;
+    state.drag = {
+      tile,
+      offsetX: e.clientX - tileLeft,
+      offsetY: e.clientY - tileTop,
+      stageRect
+    };
+    tile.el.classList.add('dragging');
+  }
+
+  function moveDrag(e) {
+    const { tile, offsetX, offsetY, stageRect } = state.drag;
+    const x = e.clientX - stageRect.left - offsetX;
+    const y = e.clientY - stageRect.top - offsetY;
+    tile.el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+  }
+
+  function endDrag(e) {
+    const { tile, stageRect } = state.drag;
+    tile.el.classList.remove('dragging');
+    // Find target slot under pointer
+    const px = e.clientX - stageRect.left;
+    const py = e.clientY - stageRect.top;
+    const N = state.grid;
+    let target = null;
+    if (px >= 0 && py >= 0 && px < state.boardSize && py < state.boardSize) {
+      const tc = Math.floor(px / state.tileSize);
+      const tr = Math.floor(py / state.tileSize);
+      const targetIdx = tr * N + tc;
+      if (targetIdx !== tile.currentIdx) {
+        target = state.tiles.find(t => t.currentIdx === targetIdx);
+      }
+    }
+    state.drag = null;
+    if (target) {
+      swapTiles(tile, target);
+    } else {
+      // snap back
+      placeTile(tile, true);
+    }
+  }
+
+  function cancelDrag() {
+    if (!state.drag) return;
+    const tile = state.drag.tile;
+    tile.el.classList.remove('dragging');
+    state.drag = null;
+    placeTile(tile, true);
+  }
+
+  // ----- Swap -----
+  function swapTiles(a, b) {
+    if (!state.started) startTimer();
+    const tmp = a.currentIdx;
+    a.currentIdx = b.currentIdx;
+    b.currentIdx = tmp;
+    placeTile(a, true);
+    placeTile(b, true);
+    a.el.classList.add('swap-pulse');
+    b.el.classList.add('swap-pulse');
+    setTimeout(() => {
+      a.el.classList.remove('swap-pulse');
+      b.el.classList.remove('swap-pulse');
+    }, 320);
+    updateCorrectMark(a);
+    updateCorrectMark(b);
+    state.moves++;
+    movesVal.textContent = state.moves;
+    updateSolvedCount();
+  }
+
+  // ============ Timer ============
+  function startTimer() {
+    state.started = true;
+    stopTimer();
+    state.timerInt = setInterval(() => {
+      state.timer++;
+      timerVal.textContent = fmtTime(state.timer);
+    }, 1000);
+  }
+  function stopTimer() {
+    if (state.timerInt) { clearInterval(state.timerInt); state.timerInt = null; }
+  }
+
+  // ============ Win ============
+  function onWin() {
+    state.solved = true;
+    stopTimer();
+    winTime.textContent = fmtTime(state.timer);
+    winMoves.textContent = state.moves;
+    setTimeout(() => {
+      winOverlay.classList.add('show');
+      launchConfetti();
+    }, 350);
+  }
+
+  function launchConfetti() {
+    const colors = ['#FFD93D', '#FF3D9A', '#3DEBFF', '#FF6B35', '#fff'];
+    const count = 80;
+    confettiContainer.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      const left = Math.random() * 100;
+      const dur = 2.4 + Math.random() * 2.2;
+      const delay = Math.random() * 0.6;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const w = 8 + Math.random() * 10;
+      const h = 12 + Math.random() * 14;
+      const rotStart = Math.random() * 360;
+      c.style.left = left + 'vw';
+      c.style.background = color;
+      c.style.width = w + 'px';
+      c.style.height = h + 'px';
+      c.style.animationDuration = dur + 's';
+      c.style.animationDelay = delay + 's';
+      c.style.transform = `rotate(${rotStart}deg)`;
+      if (Math.random() > 0.6) c.style.borderRadius = '50%';
+      confettiContainer.appendChild(c);
+    }
+    setTimeout(() => { confettiContainer.innerHTML = ''; }, 6000);
+  }
+
+  // ============ Controls ============
+  document.querySelectorAll('[data-diff]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-diff]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.grid = parseInt(btn.dataset.diff, 10);
+      if (state.img) buildPuzzle();
+    });
+  });
+
+  $('restartBtn').addEventListener('click', () => {
+    if (!state.img) { showToast('Upload an image first'); return; }
+    buildPuzzle();
+  });
+
+  $('newImgBtn').addEventListener('click', () => {
+    resetAll();
+    fileInput.click();
+  });
+
+  $('winAgainBtn').addEventListener('click', () => {
+    winOverlay.classList.remove('show');
+    confettiContainer.innerHTML = '';
+    if (state.img) buildPuzzle();
+  });
+
+  // Peek: hold to show original briefly via overlay tile
+  const peekBtn = $('previewBtn');
+  let peekEl = null;
+  function showPeek() {
+    if (!state.img || peekEl) return;
+    peekEl = document.createElement('div');
+    peekEl.style.position = 'absolute';
+    peekEl.style.inset = '0';
+    peekEl.style.backgroundImage = `url("${state.imgURL}")`;
+    peekEl.style.backgroundSize = '100% 100%';
+    peekEl.style.zIndex = '60';
+    peekEl.style.pointerEvents = 'none';
+    peekEl.style.opacity = '0';
+    peekEl.style.transition = 'opacity 180ms ease';
+    peekEl.style.border = '3px dashed #FFD93D';
+    stage.appendChild(peekEl);
+    requestAnimationFrame(() => { peekEl.style.opacity = '1'; });
+  }
+  function hidePeek() {
+    if (!peekEl) return;
+    const el = peekEl; peekEl = null;
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 200);
+  }
+  ['pointerdown'].forEach(ev => peekBtn.addEventListener(ev, (e) => { e.preventDefault(); showPeek(); }));
+  ['pointerup','pointerleave','pointercancel'].forEach(ev => peekBtn.addEventListener(ev, hidePeek));
+
+  function resetAll() {
+    stopTimer();
+    state.img = null;
+    if (state.imgURL) { URL.revokeObjectURL(state.imgURL); state.imgURL = null; }
+    state.tiles = [];
+    state.moves = 0;
+    state.timer = 0;
+    state.started = false;
+    state.solved = false;
+    state.selectedIdx = null;
+    stage.innerHTML = '';
+    stage.style.display = 'none';
+    uploadZone.style.display = 'flex';
+    hud.style.display = 'none';
+    winOverlay.classList.remove('show');
+    confettiContainer.innerHTML = '';
+  }
+
+  // ============ Resize handling ============
+  let resizeT;
+  window.addEventListener('resize', () => {
+    if (!state.img || state.tiles.length === 0) return;
+    clearTimeout(resizeT);
+    resizeT = setTimeout(() => {
+      // Recompute board size & re-position tiles
+      measureBoard();
+      const bgSize = `${state.boardSize}px ${state.boardSize}px`;
+      state.tiles.forEach(t => {
+        t.el.style.width = state.tileSize + 'px';
+        t.el.style.height = state.tileSize + 'px';
+        t.el.style.backgroundSize = bgSize;
+        const N = state.grid;
+        const cr = Math.floor(t.correctIdx / N);
+        const cc = t.correctIdx % N;
+        t.el.style.backgroundPosition = `-${cc * state.tileSize}px -${cr * state.tileSize}px`;
+        placeTile(t, false);
+      });
+    }, 120);
+  });
+
+  // Prevent default drag-image ghost on tiles
+  stage.addEventListener('dragstart', (e) => e.preventDefault());
+
+})();
+</script>
+</body>
+</html>
