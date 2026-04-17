@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hue — Gradient from Image</title>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600&f[]=general-sans@400,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f4ed;
+    --surface:#faf9f5;
+    --secondary:#e8e6dc;
+    --text:#141413;
+    --text-2:#5e5d59;
+    --muted:#87867f;
+    --accent:#c96442;
+    --radius:18px;
+    --radius-sm:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'General Sans',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+    font-size:14px;
+    line-height:1.5;
+  }
+  /* layout */
+  .app{
+    height:100vh;
+    height:100dvh;
+    display:flex;
+    flex-direction:column;
+    padding:18px 22px;
+    gap:14px;
+  }
+  header{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    flex-shrink:0;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .brand-mark{
+    width:30px;height:30px;border-radius:9px;
+    background:conic-gradient(from 210deg at 50% 50%, #c96442, #e9c39a, #6f8b9b, #c96442);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.05), 0 4px 14px rgba(201,100,66,.25);
+  }
+  h1{
+    font-family:'Clash Display',serif;
+    font-weight:600;
+    font-size:clamp(20px, 2.4vw, 28px);
+    letter-spacing:-.02em;
+    line-height:1;
+    opacity:0;
+    transform:translateY(8px);
+    animation:rise .55s ease-out .05s forwards;
+  }
+  .tagline{
+    color:var(--text-2);
+    font-size:13px;
+    margin-top:4px;
+    opacity:0;
+    animation:fade .8s ease-out .25s forwards;
+  }
+  .hint{
+    color:var(--muted);
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    opacity:0;
+    animation:fade .8s ease-out .35s forwards;
+  }
+  @keyframes rise{to{opacity:1;transform:translateY(0)}}
+  @keyframes fade{to{opacity:1}}
+
+  main{
+    flex:1;
+    min-height:0;
+    display:grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr);
+    gap:14px;
+    opacity:0;
+    animation:fade .7s ease-out .15s forwards;
+  }
+
+  /* preview */
+  .preview-wrap{
+    background:var(--surface);
+    border:1px solid var(--secondary);
+    border-radius:var(--radius);
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    position:relative;
+  }
+  .preview-stage{
+    flex:1;
+    min-height:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+  .preview{
+    width:100%;
+    height:100%;
+    border-radius:14px;
+    box-shadow:
+      0 1px 2px rgba(20,20,19,.06),
+      0 20px 50px -20px rgba(20,20,19,.25),
+      inset 0 0 0 1px rgba(255,255,255,.4);
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(135deg,#e8e6dc,#faf9f5);
+    transition:filter .15s ease;
+  }
+  .preview-text{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:30px;
+    color:#fff;
+    text-shadow:0 2px 30px rgba(0,0,0,.25);
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .25s ease;
+  }
+  .preview-text.show{opacity:1}
+  .preview-text h2{
+    font-family:'Clash Display',serif;
+    font-weight:600;
+    font-size:clamp(28px, 4.5vw, 56px);
+    letter-spacing:-.02em;
+    line-height:1;
+  }
+  .preview-text p{
+    margin-top:10px;
+    font-size:13px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    opacity:.85;
+  }
+
+  .preview-meta{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:14px;
+    gap:12px;
+    flex-shrink:0;
+  }
+  .swatches{
+    display:flex;
+    gap:6px;
+  }
+  .swatch{
+    width:22px;height:22px;
+    border-radius:7px;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
+    transition:transform .15s ease;
+  }
+  .swatch:hover{transform:translateY(-2px)}
+  .meta-label{
+    color:var(--muted);
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+  }
+
+  /* controls */
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--secondary);
+    border-radius:var(--radius);
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    overflow-y:auto;
+    min-height:0;
+  }
+  .panel::-webkit-scrollbar{width:6px}
+  .panel::-webkit-scrollbar-thumb{background:var(--secondary);border-radius:3px}
+
+  .section-title{
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:500;
+  }
+
+  /* dropzone */
+  .dropzone{
+    border:1.5px dashed #d6d3c5;
+    border-radius:var(--radius-sm);
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .2s ease, background .2s ease;
+    background:rgba(232,230,220,.25);
+  }
+  .dropzone:hover, .dropzone.drag{
+    border-color:var(--accent);
+    background:rgba(201,100,66,.05);
+  }
+  .dropzone svg{color:var(--text-2)}
+  .dropzone .dz-title{font-weight:500;color:var(--text);font-size:13px}
+  .dropzone .dz-sub{color:var(--muted);font-size:11px}
+  .dropzone.has-image{
+    padding:10px;
+    flex-direction:row;
+    gap:10px;
+    justify-content:flex-start;
+  }
+  .thumb{
+    width:44px;height:44px;
+    border-radius:8px;
+    object-fit:cover;
+    flex-shrink:0;
+  }
+  .thumb-info{
+    text-align:left;
+    flex:1;
+    min-width:0;
+  }
+  .thumb-info .name{
+    font-size:12px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    color:var(--text);
+  }
+  .thumb-info .sub{
+    font-size:11px;color:var(--muted);
+  }
+  .x-btn{
+    background:none;border:none;
+    color:var(--muted);
+    cursor:pointer;
+    padding:6px;
+    border-radius:6px;
+    display:flex;
+  }
+  .x-btn:hover{background:var(--secondary);color:var(--text)}
+
+  /* slider */
+  .control{display:flex;flex-direction:column;gap:8px}
+  .control-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+  }
+  .control-label{font-size:13px;font-weight:500;color:var(--text)}
+  .control-value{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;
+    width:100%;height:4px;
+    background:var(--secondary);
+    border-radius:2px;
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:16px;height:16px;border-radius:50%;
+    background:var(--text);
+    cursor:pointer;
+    border:3px solid var(--surface);
+    box-shadow:0 0 0 1px var(--text);
+    transition:transform .12s ease;
+  }
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;
+    background:var(--text);cursor:pointer;border:none;
+  }
+
+  /* select chips */
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid var(--secondary);
+    background:var(--surface);
+    font-size:12px;
+    cursor:pointer;
+    color:var(--text-2);
+    transition:all .15s ease;
+    font-family:inherit;
+  }
+  .chip:hover{border-color:var(--muted);color:var(--text)}
+  .chip.active{background:var(--text);color:var(--surface);border-color:var(--text)}
+
+  /* toggle */
+  .toggle-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .switch{
+    position:relative;
+    width:36px;height:20px;
+    background:var(--secondary);
+    border-radius:999px;
+    cursor:pointer;
+    transition:background .2s;
+    flex-shrink:0;
+  }
+  .switch::after{
+    content:"";
+    position:absolute;
+    top:2px;left:2px;
+    width:16px;height:16px;
+    background:var(--surface);
+    border-radius:50%;
+    box-shadow:0 1px 3px rgba(0,0,0,.15);
+    transition:transform .2s;
+  }
+  .switch.on{background:var(--accent)}
+  .switch.on::after{transform:translateX(16px)}
+
+  .text-input{
+    width:100%;
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid var(--secondary);
+    background:var(--bg);
+    font-family:inherit;
+    font-size:13px;
+    color:var(--text);
+    outline:none;
+    transition:border-color .15s;
+  }
+  .text-input:focus{border-color:var(--muted)}
+
+  /* buttons */
+  .btn-row{display:flex;gap:8px}
+  .btn{
+    flex:1;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid var(--secondary);
+    background:var(--surface);
+    font-family:inherit;
+    font-size:13px;
+    font-weight:500;
+    color:var(--text);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    transition:all .15s ease;
+  }
+  .btn:hover{background:var(--secondary)}
+  .btn.primary{
+    background:var(--text);color:var(--surface);border-color:var(--text);
+  }
+  .btn.primary:hover{background:#000}
+  .btn.accent{
+    background:var(--accent);color:#fff;border-color:var(--accent);
+  }
+  .btn.accent:hover{filter:brightness(.95)}
+  .btn svg{flex-shrink:0}
+
+  .divider{height:1px;background:var(--secondary);margin:2px 0}
+
+  /* toast */
+  .toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--text);
+    color:var(--surface);
+    padding:10px 16px;
+    border-radius:10px;
+    font-size:12px;
+    opacity:0;
+    pointer-events:none;
+    transition:all .3s ease;
+    z-index:50;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* mobile */
+  @media (max-width: 767px){
+    body{overflow-y:auto}
+    .app{
+      height:auto;
+      min-height:100dvh;
+      padding:14px;
+      gap:10px;
+    }
+    header{flex-direction:column;align-items:flex-start;gap:6px}
+    .hint{display:none}
+    main{
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+    .preview-wrap{
+      position:sticky;
+      top:10px;
+      z-index:5;
+      height:42vh;
+      min-height:280px;
+      padding:12px;
+    }
+    .panel{
+      overflow:visible;
+      padding:14px;
+    }
+    .preview-meta{margin-top:10px}
+  }
+  @media (max-width: 380px){
+    .btn{padding:9px 8px;font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <h1>Hue Studio</h1>
+      </div>
+      <div class="tagline">Turn any image into a soft, editorial gradient.</div>
+    </div>
+    <div class="hint">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      Drop an image or shuffle to begin.
+    </div>
+  </header>
+
+  <main>
+    <!-- LEFT: PREVIEW -->
+    <section class="preview-wrap">
+      <div class="preview-stage">
+        <div class="preview" id="preview">
+          <div class="preview-text" id="previewText">
+            <h2 id="overlayTitle">Quiet mornings</h2>
+            <p id="overlaySub">A study in warm light</p>
+          </div>
+        </div>
+      </div>
+      <div class="preview-meta">
+        <div>
+          <div class="meta-label">Palette</div>
+          <div class="swatches" id="swatches"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="meta-label">Style</div>
+          <div style="font-size:13px;color:var(--text-2);text-transform:capitalize" id="styleLabel">Radial bloom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: CONTROLS -->
+    <aside class="panel">
+      <div class="control">
+        <div class="section-title">Source image</div>
+        <div class="dropzone" id="dropzone">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div class="dz-title">Drop image or click to upload</div>
+          <div class="dz-sub">JPG, PNG · We extract a palette</div>
+          <input type="file" id="fileInput" accept="image/*" style="display:none">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="control">
+        <div class="section-title">Style</div>
+        <div class="chips" id="styleChips">
+          <button class="chip active" data-style="radial">Radial bloom</button>
+          <button class="chip" data-style="mesh">Mesh blend</button>
+          <button class="chip" data-style="linear">Linear flow</button>
+          <button class="chip" data-style="conic">Conic veil</button>
+        </div>
+      </div>
+
+      <div class="control">
+        <div class="control-head">
+          <span class="control-label">Intensity</span>
+          <span class="control-value" id="intensityVal">70%</span>
+        </div>
+        <input type="range" id="intensity" min="20" max="100" value="70">
+      </div>
+
+      <div class="control">
+        <div class="control-head">
+          <span class="control-label">Softness</span>
+          <span class="control-value" id="softnessVal">40px</span>
+        </div>
+        <input type="range" id="softness" min="0" max="120" value="40">
+      </div>
+
+      <div class="control">
+        <div class="control-head">
+          <span class="control-label">Grain</span>
+          <span class="control-value" id="grainVal">10%</span>
+        </div>
+        <input type="range" id="grain" min="0" max="50" value="10">
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="control-label">Overlay text</div>
+          <div style="font-size:11px;color:var(--muted)">Preview as a poster</div>
+        </div>
+        <div class="switch" id="textToggle"></div>
+      </div>
+      <input type="text" class="text-input" id="overlayInput" placeholder="Quiet mornings" value="Quiet mornings" style="display:none">
+
+      <div class="divider"></div>
+
+      <div class="btn-row">
+        <button class="btn" id="shuffleBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+          Shuffle
+        </button>
+        <button class="btn" id="copyBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy CSS
+        </button>
+      </div>
+      <button class="btn accent" id="downloadBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download PNG
+      </button>
+    </aside>
+  </main>
+</div>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+(() => {
+  // ---------- state ----------
+  const state = {
+    colors: ['#e9c39a','#c96442','#6f8b9b','#3b3a36','#d8c9a8'],
+    style: 'radial',
+    intensity: 70,
+    softness: 40,
+    grain: 10,
+    overlay: false,
+    overlayText: 'Quiet mornings',
+  };
+
+  // ---------- elements ----------
+  const $ = (id) => document.getElementById(id);
+  const preview = $('preview');
+  const swatches = $('swatches');
+  const dropzone = $('dropzone');
+  const fileInput = $('fileInput');
+  const intensity = $('intensity');
+  const softness = $('softness');
+  const grain = $('grain');
+  const intensityVal = $('intensityVal');
+  const softnessVal = $('softnessVal');
+  const grainVal = $('grainVal');
+  const styleChips = $('styleChips');
+  const styleLabel = $('styleLabel');
+  const previewText = $('previewText');
+  const overlayTitle = $('overlayTitle');
+  const overlayInput = $('overlayInput');
+  const textToggle = $('textToggle');
+  const shuffleBtn = $('shuffleBtn');
+  const copyBtn = $('copyBtn');
+  const downloadBtn = $('downloadBtn');
+  const toast = $('toast');
+
+  // ---------- toast ----------
+  let toastTimer;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>toast.classList.remove('show'), 1600);
+  }
+
+  // ---------- color extraction ----------
+  function extractPalette(img, k=5){
+    const canvas = document.createElement('canvas');
+    const size = 80;
+    const ratio = img.width / img.height;
+    canvas.width = ratio > 1 ? size : Math.round(size*ratio);
+    canvas.height = ratio > 1 ? Math.round(size/ratio) : size;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+
+    // simple histogram quantization (5-bit per channel)
+    const buckets = new Map();
+    for (let i=0;i<data.length;i+=4){
+      const a = data[i+3];
+      if (a < 200) continue;
+      const r = data[i] >> 3;
+      const g = data[i+1] >> 3;
+      const b = data[i+2] >> 3;
+      const key = (r<<10) | (g<<5) | b;
+      const cur = buckets.get(key);
+      if (cur){ cur[0]+=data[i]; cur[1]+=data[i+1]; cur[2]+=data[i+2]; cur[3]++; }
+      else buckets.set(key, [data[i],data[i+1],data[i+2],1]);
+    }
+    let arr = Array.from(buckets.values()).map(b => ({
+      r: b[0]/b[3]|0, g: b[1]/b[3]|0, b: b[2]/b[3]|0, c: b[3]
+    }));
+    // sort by count
+    arr.sort((a,b)=>b.c - a.c);
+
+    // pick top with diversity (min distance threshold)
+    const picked = [];
+    for (const col of arr){
+      const tooClose = picked.some(p => {
+        const dr=p.r-col.r, dg=p.g-col.g, db=p.b-col.b;
+        return (dr*dr+dg*dg+db*db) < 1800;
+      });
+      if (!tooClose) picked.push(col);
+      if (picked.length >= k) break;
+    }
+    while (picked.length < 3 && arr.length){ picked.push(arr[picked.length] || arr[0]); }
+
+    return picked.map(p => rgbToHex(p.r,p.g,p.b));
+  }
+  function rgbToHex(r,g,b){
+    return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+  }
+  function hexToRgb(h){
+    const n = parseInt(h.slice(1),16);
+    return {r:(n>>16)&255, g:(n>>8)&255, b:n&255};
+  }
+  function withAlpha(hex, a){
+    const {r,g,b} = hexToRgb(hex);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  // ---------- gradient generators ----------
+  function gradientCSS(){
+    const c = state.colors;
+    const intensity = state.intensity / 100; // 0.2..1
+    const alpha = 0.55 + intensity*0.45;
+
+    if (state.style === 'radial'){
+      const pos = [
+        ['15% 20%','60%'],
+        ['85% 15%','55%'],
+        ['75% 85%','60%'],
+        ['20% 80%','55%'],
+        ['50% 50%','70%'],
+        ['100% 50%','50%'],
+      ];
+      const layers = c.slice(0,Math.max(3,c.length)).map((col,i)=>{
+        const p = pos[i % pos.length];
+        return `radial-gradient(circle at ${p[0]}, ${withAlpha(col,alpha)} 0%, ${withAlpha(col,0)} ${p[1]})`;
+      });
+      const base = c[0];
+      return layers.join(', ') + `, linear-gradient(135deg, ${base}, ${c[c.length-1]})`;
+    }
+    if (state.style === 'mesh'){
+      const positions = ['10% 10%','90% 10%','50% 50%','10% 90%','90% 90%','50% 0%'];
+      const layers = c.map((col,i)=>{
+        const p = positions[i % positions.length];
+        return `radial-gradient(at ${p}, ${withAlpha(col, alpha*0.9)} 0px, ${withAlpha(col,0)} 50%)`;
+      });
+      return layers.join(', ') + `, linear-gradient(120deg, ${c[0]}, ${c[Math.min(2,c.length-1)]})`;
+    }
+    if (state.style === 'linear'){
+      const stops = c.map((col,i)=>`${col} ${(i/(c.length-1)*100).toFixed(0)}%`);
+      return `linear-gradient(135deg, ${stops.join(', ')})`;
+    }
+    if (state.style === 'conic'){
+      const stops = c.concat(c[0]).map((col,i,arr)=>`${col} ${(i/(arr.length-1)*360).toFixed(0)}deg`);
+      return `conic-gradient(from 45deg at 50% 50%, ${stops.join(', ')})`;
+    }
+  }
+
+  // ---------- render ----------
+  function render(){
+    const css = gradientCSS();
+    preview.style.backgroundImage = css;
+    preview.style.backgroundSize = 'cover';
+    preview.style.backgroundPosition = 'center';
+    preview.style.filter = `blur(0px) saturate(${0.9 + state.intensity/200})`;
+
+    // softness — apply via inset blurry overlay using box-shadow inset?
+    // simpler: use a CSS filter on a pseudo via inline style? We'll use backdrop softness via filter blur on a stacked layer.
+    // We'll use a CSS variable on preview for inner blur via "filter:blur" wraps badly. Instead use mask/box-shadow.
+    // Apply softness using a subtle inner glow with shadow.
+    const soft = state.softness;
+    preview.style.boxShadow = `
+      0 1px 2px rgba(20,20,19,.06),
+      0 20px 50px -20px rgba(20,20,19,.25),
+      inset 0 0 ${soft*1.5}px ${withAlpha(state.colors[0], 0.3)},
+      inset 0 0 0 1px rgba(255,255,255,.4)
+    `;
+
+    // grain via background overlay (svg noise)
+    const grainOpacity = state.grain / 100;
+    if (grainOpacity > 0.001){
+      const noise = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 ${grainOpacity} 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`;
+      preview.style.backgroundImage = noise + ', ' + css;
+    }
+
+    // swatches
+    swatches.innerHTML = '';
+    state.colors.forEach(col=>{
+      const s = document.createElement('div');
+      s.className = 'swatch';
+      s.style.background = col;
+      s.title = col;
+      swatches.appendChild(s);
+    });
+
+    // labels
+    intensityVal.textContent = state.intensity + '%';
+    softnessVal.textContent = state.softness + 'px';
+    grainVal.textContent = state.grain + '%';
+    const styleNames = {radial:'Radial bloom', mesh:'Mesh blend', linear:'Linear flow', conic:'Conic veil'};
+    styleLabel.textContent = styleNames[state.style];
+  }
+
+  // ---------- events ----------
+  function handleFile(file){
+    if (!file || !file.type.startsWith('image/')) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const palette = extractPalette(img, 5);
+      if (palette.length){
+        state.colors = palette;
+        render();
+      }
+      // update dropzone to thumb
+      dropzone.classList.add('has-image');
+      dropzone.innerHTML = `
+        <img class="thumb" src="${url}" alt="">
+        <div class="thumb-info">
+          <div class="name">${file.name}</div>
+          <div class="sub">${palette.length} colors extracted</div>
+        </div>
+        <button class="x-btn" id="resetBtn" title="Remove">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      `;
+      $('resetBtn').addEventListener('click', (e)=>{
+        e.stopPropagation();
+        resetDropzone();
+      });
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  }
+
+  function resetDropzone(){
+    dropzone.classList.remove('has-image');
+    dropzone.innerHTML = `
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <div class="dz-title">Drop image or click to upload</div>
+      <div class="dz-sub">JPG, PNG · We extract a palette</div>
+      <input type="file" id="fileInput" accept="image/*" style="display:none">
+    `;
+    bindFileInput();
+  }
+
+  function bindFileInput(){
+    const fi = document.getElementById('fileInput');
+    if (fi){
+      fi.addEventListener('change', e => {
+        if (e.target.files[0]) handleFile(e.target.files[0]);
+      });
+    }
+  }
+
+  dropzone.addEventListener('click', ()=>{
+    const fi = document.getElementById('fileInput');
+    if (fi) fi.click();
+  });
+  ['dragenter','dragover'].forEach(ev=>{
+    dropzone.addEventListener(ev, e=>{
+      e.preventDefault(); e.stopPropagation();
+      dropzone.classList.add('drag');
+    });
+  });
+  ['dragleave','drop'].forEach(ev=>{
+    dropzone.addEventListener(ev, e=>{
+      e.preventDefault(); e.stopPropagation();
+      dropzone.classList.remove('drag');
+    });
+  });
+  dropzone.addEventListener('drop', e=>{
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  bindFileInput();
+
+  // sliders
+  intensity.addEventListener('input', e=>{ state.intensity = +e.target.value; render(); });
+  softness.addEventListener('input', e=>{ state.softness = +e.target.value; render(); });
+  grain.addEventListener('input', e=>{ state.grain = +e.target.value; render(); });
+
+  // styles
+  styleChips.addEventListener('click', e=>{
+    const btn = e.target.closest('.chip');
+    if (!btn) return;
+    state.style = btn.dataset.style;
+    [...styleChips.children].forEach(c=>c.classList.toggle('active', c===btn));
+    render();
+  });
+
+  // overlay
+  textToggle.addEventListener('click', ()=>{
+    state.overlay = !state.overlay;
+    textToggle.classList.toggle('on', state.overlay);
+    previewText.classList.toggle('show', state.overlay);
+    overlayInput.style.display = state.overlay ? 'block' : 'none';
+  });
+  overlayInput.addEventListener('input', e=>{
+    overlayTitle.textContent = e.target.value || ' ';
+  });
+
+  // shuffle
+  const palettes = [
+    ['#f4d6c4','#e89a7e','#a04e3a','#3a2c2a','#f0e3d3'],
+    ['#bcd4d8','#7ea4b0','#3d5a6c','#e8e4d3','#c2b09a'],
+    ['#f3e2c4','#d9a679','#8e5a3b','#42342a','#ecd9be'],
+    ['#dcd2e8','#a594c4','#6b5b8e','#3a2f4f','#f0ebd8'],
+    ['#e8dfd0','#c9a96e','#7a6240','#2e2a25','#dcc7a4'],
+    ['#f0c9c1','#c97a76','#6b3a3c','#3d2828','#f4e3da'],
+    ['#cfe0d4','#8eb09a','#46695a','#2a3a35','#e6e7d8'],
+    ['#fde2c7','#f9b67a','#d97a3c','#7c3a1f','#fff1e0'],
+  ];
+  shuffleBtn.addEventListener('click', ()=>{
+    if (dropzone.classList.contains('has-image')){
+      // shuffle order if from image
+      state.colors = [...state.colors].sort(()=>Math.random()-.5);
+    } else {
+      state.colors = palettes[Math.floor(Math.random()*palettes.length)];
+    }
+    render();
+  });
+
+  // copy CSS
+  copyBtn.addEventListener('click', async ()=>{
+    const css = `background-image: ${gradientCSS()};`;
+    try {
+      await navigator.clipboard.writeText(css);
+      showToast('CSS copied to clipboard');
+    } catch {
+      showToast('Copy failed');
+    }
+  });
+
+  // download PNG
+  downloadBtn.addEventListener('click', ()=>{
+    const W = 1600, H = 1200;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // base
+    const base = ctx.createLinearGradient(0,0,W,H);
+    base.addColorStop(0, state.colors[0]);
+    base.addColorStop(1, state.colors[state.colors.length-1]);
+    ctx.fillStyle = base;
+    ctx.fillRect(0,0,W,H);
+
+    const a = 0.55 + state.intensity/100*0.45;
+
+    if (state.style === 'radial' || state.style === 'mesh'){
+      const positions = state.style === 'radial'
+        ? [[.15,.2],[.85,.15],[.75,.85],[.2,.8],[.5,.5],[1,.5]]
+        : [[.1,.1],[.9,.1],[.5,.5],[.1,.9],[.9,.9],[.5,0]];
+      ctx.globalCompositeOperation = 'source-over';
+      state.colors.forEach((col,i)=>{
+        const p = positions[i % positions.length];
+        const cx = p[0]*W, cy = p[1]*H;
+        const r = Math.max(W,H) * 0.6;
+        const grd = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+        const {r:rr,g:gg,b:bb} = hexToRgb(col);
+        grd.addColorStop(0, `rgba(${rr},${gg},${bb},${a})`);
+        grd.addColorStop(1, `rgba(${rr},${gg},${bb},0)`);
+        ctx.fillStyle = grd;
+        ctx.fillRect(0,0,W,H);
+      });
+    } else if (state.style === 'linear'){
+      const grd = ctx.createLinearGradient(0,0,W,H);
+      state.colors.forEach((c,i)=>grd.addColorStop(i/(state.colors.length-1), c));
+      ctx.fillStyle = grd;
+      ctx.fillRect(0,0,W,H);
+    } else if (state.style === 'conic'){
+      // canvas conic via small loop
+      const cx = W/2, cy = H/2;
+      const cols = state.colors.concat(state.colors[0]);
+      for (let deg=0; deg<360; deg++){
+        const t = deg/360 * (cols.length-1);
+        const i = Math.floor(t);
+        const f = t - i;
+        const c1 = hexToRgb(cols[i]);
+        const c2 = hexToRgb(cols[Math.min(i+1, cols.length-1)]);
+        const r = Math.round(c1.r+(c2.r-c1.r)*f);
+        const g = Math.round(c1.g+(c2.g-c1.g)*f);
+        const b = Math.round(c1.b+(c2.b-c1.b)*f);
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.beginPath();
+        ctx.moveTo(cx,cy);
+        const a1 = (deg-90)*Math.PI/180;
+        const a2 = (deg-89)*Math.PI/180;
+        ctx.arc(cx,cy,Math.hypot(W,H), a1, a2);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    // overlay text
+    if (state.overlay){
+      ctx.fillStyle = 'rgba(255,255,255,.95)';
+      ctx.textAlign = 'center';
+      ctx.font = '600 110px "Clash Display", serif';
+      ctx.shadowColor = 'rgba(0,0,0,.25)';
+      ctx.shadowBlur = 40;
+      ctx.fillText(overlayTitle.textContent, W/2, H/2);
+      ctx.shadowBlur = 0;
+      ctx.font = '500 26px "General Sans", sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,.85)';
+      ctx.fillText('A STUDY IN WARM LIGHT', W/2, H/2 + 70);
+    }
+
+    canvas.toBlob(blob=>{
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'hue-gradient.png';
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+      showToast('Image downloaded');
+    }, 'image/png');
+  });
+
+  // initial
+  render();
+})();
+</script>
+</body>
+</html>
