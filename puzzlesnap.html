@@ -2,59 +2,117 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>PuzzleSnap — Make your image a puzzle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
 <style>
   /* ---------- Reset / Base ---------- */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body {
+  html {
     background: #0D0D0D;
-    color: #fff;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
     min-height: 100%;
-    overflow-x: hidden;
-    -webkit-tap-highlight-color: transparent;
   }
   body {
+    color: #fff;
+    font-family: 'Outfit', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
     background-image:
       radial-gradient(circle at 12% 18%, rgba(255, 61, 154, 0.15), transparent 35%),
       radial-gradient(circle at 88% 22%, rgba(61, 235, 255, 0.13), transparent 38%),
       radial-gradient(circle at 75% 90%, rgba(255, 217, 61, 0.10), transparent 40%),
       radial-gradient(circle at 20% 85%, rgba(255, 107, 53, 0.10), transparent 40%);
     background-attachment: fixed;
-    padding: 24px 16px 60px;
-    position: relative;
+    background-color: #0D0D0D;
   }
-  /* halftone dots */
   body::before {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
-    background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(255,255,255,0.045) 1px, transparent 1px);
     background-size: 22px 22px;
     z-index: 0;
   }
 
-  .display { font-family: 'Bangers', 'Space Grotesk', cursive; letter-spacing: 1.5px; }
-
-  /* ---------- Layout ---------- */
-  .wrap {
-    max-width: 1100px;
-    margin: 0 auto;
+  /* ============================================================
+     LAYOUT — Mobile-first, desktop 2-column
+  ============================================================ */
+  .page {
     position: relative;
     z-index: 1;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px 16px 48px;
   }
 
-  /* ---------- Header ---------- */
-  header {
+  /* Header always spans full width */
+  .page-header {
     text-align: center;
-    margin-bottom: 28px;
-    position: relative;
+    margin-bottom: 24px;
   }
+
+  /* On desktop: side-by-side grid */
+  .layout-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .col-board {
+    width: 100%;
+    max-width: 580px;
+  }
+
+  .col-sidebar {
+    width: 100%;
+    max-width: 580px;
+  }
+
+  /* ── Desktop ── */
+  @media (min-width: 900px) {
+    .page {
+      padding: 28px 32px 48px;
+    }
+    .page-header {
+      margin-bottom: 32px;
+    }
+    .layout-grid {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 28px;
+    }
+    .col-board {
+      flex: 0 0 auto;
+      width: min(50vw, 560px);
+      max-width: 560px;
+    }
+    .col-sidebar {
+      flex: 0 0 280px;
+      width: 280px;
+      max-width: 280px;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .col-board {
+      width: min(50vw, 600px);
+      max-width: 600px;
+    }
+    .col-sidebar {
+      flex: 0 0 300px;
+      width: 300px;
+    }
+  }
+
+  /* ============================================================
+     HEADER
+  ============================================================ */
   .title-card {
     display: inline-block;
     background: #FFD93D;
@@ -68,7 +126,7 @@
   }
   .title-card h1 {
     font-family: 'Bangers', cursive;
-    font-size: clamp(2.6rem, 7vw, 4.5rem);
+    font-size: clamp(2.4rem, 6vw, 4rem);
     line-height: 1;
     letter-spacing: 3px;
     text-shadow: 3px 3px 0 #FF3D9A;
@@ -90,12 +148,12 @@
     transform: rotate(12deg);
     border-radius: 50px;
     box-shadow: 4px 4px 0 #0D0D0D;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
   .subtitle {
     margin-top: 18px;
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 1rem;
     letter-spacing: 1px;
     color: #fff;
     display: inline-block;
@@ -106,18 +164,20 @@
     transform: rotate(0.8deg);
   }
 
-  /* ---------- HUD (timer / moves / win bar) ---------- */
+  /* ============================================================
+     HUD CHIPS (sidebar on desktop)
+  ============================================================ */
   .hud {
     display: flex;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin: 22px 0 18px;
+    margin-bottom: 18px;
   }
   .hud-chip {
     background: #0D0D0D;
     border: 3px solid #fff;
-    padding: 8px 14px;
+    padding: 10px 14px;
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -125,25 +185,41 @@
     font-weight: 700;
     box-shadow: 4px 4px 0 #FFD93D;
     transform: rotate(-1deg);
-    min-width: 110px;
+    flex: 1;
+    min-width: 90px;
   }
   .hud-chip.pink { box-shadow: 4px 4px 0 #FF3D9A; transform: rotate(1deg); }
   .hud-chip.cyan { box-shadow: 4px 4px 0 #3DEBFF; transform: rotate(-0.5deg); }
   .hud-chip svg { width: 18px; height: 18px; flex-shrink: 0; }
-  .hud-chip .label { font-size: 0.7rem; opacity: 0.7; letter-spacing: 1px; text-transform: uppercase; }
-  .hud-chip .value { font-family: 'Bangers', cursive; font-size: 1.3rem; letter-spacing: 1.5px; line-height: 1; }
+  .hud-chip .label { font-size: 0.65rem; opacity: 0.7; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+  .hud-chip .value { font-family: 'Bangers', cursive; font-size: 1.25rem; letter-spacing: 1.5px; line-height: 1; }
 
-  /* ---------- Main board card ---------- */
+  @media (min-width: 900px) {
+    .hud {
+      flex-direction: column;
+      gap: 10px;
+    }
+    .hud-chip {
+      transform: none !important;
+      flex: none;
+      width: 100%;
+      padding: 12px 16px;
+    }
+    .hud-chip .value { font-size: 1.4rem; }
+  }
+
+  /* ============================================================
+     BOARD CARD
+  ============================================================ */
   .board-card {
     background: #fff;
     border: 3px solid #0D0D0D;
     border-radius: 18px;
     padding: 18px;
     box-shadow: 10px 10px 0 #FF3D9A, 10px 10px 0 3px #0D0D0D;
-    transform: rotate(-0.6deg);
+    transform: rotate(-0.5deg);
     position: relative;
-    margin: 0 auto;
-    max-width: 720px;
+    width: 100%;
   }
   .board-card::before {
     content: "";
@@ -168,7 +244,7 @@
     box-shadow: 2px 2px 0 #0D0D0D;
   }
 
-  /* ---------- Upload (empty state) ---------- */
+  /* ---------- Upload zone ---------- */
   .upload-zone {
     width: 100%;
     aspect-ratio: 1 / 1;
@@ -181,11 +257,7 @@
     gap: 14px;
     cursor: pointer;
     background: repeating-linear-gradient(
-      45deg,
-      #fffbe6,
-      #fffbe6 14px,
-      #fff 14px,
-      #fff 28px
+      45deg, #fffbe6, #fffbe6 14px, #fff 14px, #fff 28px
     );
     color: #0D0D0D;
     transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
@@ -202,7 +274,7 @@
     background: repeating-linear-gradient(45deg, #ffe6f3, #ffe6f3 14px, #fff 14px, #fff 28px);
   }
   .upload-icon {
-    width: 90px; height: 90px;
+    width: 80px; height: 80px;
     background: #FF3D9A;
     border: 3px solid #0D0D0D;
     border-radius: 16px;
@@ -210,17 +282,17 @@
     box-shadow: 5px 5px 0 #0D0D0D;
     transform: rotate(-4deg);
   }
-  .upload-icon svg { width: 50px; height: 50px; color: #fff; }
+  .upload-icon svg { width: 44px; height: 44px; color: #fff; }
   .upload-text {
     font-family: 'Bangers', cursive;
-    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
     letter-spacing: 2px;
     color: #0D0D0D;
     text-align: center;
   }
   .upload-sub {
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #444;
     background: #FFD93D;
     border: 2px solid #0D0D0D;
@@ -229,7 +301,7 @@
     transform: rotate(1deg);
   }
 
-  /* ---------- Puzzle Board ---------- */
+  /* ---------- Puzzle Stage ---------- */
   .puzzle-stage {
     position: relative;
     width: 100%;
@@ -269,36 +341,62 @@
     100% { filter: brightness(1); }
   }
 
-  /* ---------- Controls ---------- */
-  .controls {
-    margin-top: 22px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    align-items: center;
+  /* ============================================================
+     SIDEBAR CONTROLS
+  ============================================================ */
+  .sidebar-card {
+    background: #0D0D0D;
+    border: 3px solid #fff;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 8px 8px 0 #3DEBFF, 8px 8px 0 3px #0D0D0D;
+    position: relative;
   }
-  .control-group {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
+
+  .sidebar-section {
+    margin-bottom: 18px;
   }
-  .group-label {
+  .sidebar-section:last-child { margin-bottom: 0; }
+
+  .section-label {
     font-family: 'Bangers', cursive;
     letter-spacing: 2px;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: #FFD93D;
     background: #0D0D0D;
-    padding: 4px 12px;
+    padding: 3px 10px;
     border: 2px solid #FFD93D;
     border-radius: 20px;
-    transform: rotate(-2deg);
+    display: inline-block;
+    margin-bottom: 10px;
+    transform: rotate(-1deg);
   }
+
+  .diff-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .action-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  @media (min-width: 900px) {
+    .diff-group { flex-direction: column; gap: 8px; }
+    .action-group { flex-direction: column; gap: 8px; }
+    .btn { width: 100%; justify-content: flex-start; }
+  }
+
+  /* ============================================================
+     BUTTONS
+  ============================================================ */
   .btn {
     font-family: 'Bangers', cursive;
     letter-spacing: 1.5px;
-    font-size: 1.05rem;
-    padding: 10px 18px;
+    font-size: 1rem;
+    padding: 10px 16px;
     background: #fff;
     color: #0D0D0D;
     border: 3px solid #0D0D0D;
@@ -310,8 +408,9 @@
     align-items: center;
     gap: 8px;
     user-select: none;
+    white-space: nowrap;
   }
-  .btn svg { width: 18px; height: 18px; }
+  .btn svg { width: 17px; height: 17px; flex-shrink: 0; }
   .btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #0D0D0D; }
   .btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #0D0D0D; }
   .btn.yellow { background: #FFD93D; }
@@ -325,11 +424,44 @@
     box-shadow: 4px 4px 0 #FF3D9A;
   }
 
-  /* ---------- Win banner ---------- */
+  /* Mobile controls (shown below board on mobile) */
+  .mobile-controls {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+  }
+  .mobile-controls .control-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .mobile-controls .group-label {
+    font-family: 'Bangers', cursive;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    color: #FFD93D;
+    background: #0D0D0D;
+    padding: 4px 12px;
+    border: 2px solid #FFD93D;
+    border-radius: 20px;
+    transform: rotate(-2deg);
+    display: inline-block;
+  }
+
+  @media (min-width: 900px) {
+    .mobile-controls { display: none; }
+  }
+
+  /* ============================================================
+     WIN OVERLAY
+  ============================================================ */
   .win-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(13,13,13,0.75);
+    background: rgba(13,13,13,0.80);
     display: none;
     align-items: center;
     justify-content: center;
@@ -342,7 +474,7 @@
     background: #FFD93D;
     border: 4px solid #0D0D0D;
     border-radius: 22px;
-    padding: 30px 36px;
+    padding: 32px 40px;
     text-align: center;
     box-shadow: 12px 12px 0 #FF3D9A, 12px 12px 0 4px #0D0D0D;
     transform: rotate(-3deg);
@@ -374,7 +506,7 @@
     background: #0D0D0D;
     color: #FFD93D;
     border: 3px solid #0D0D0D;
-    padding: 8px 14px;
+    padding: 10px 16px;
     border-radius: 10px;
     font-weight: 700;
   }
@@ -382,24 +514,26 @@
   .win-stat .l { font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.8; }
   .win-burst {
     position: absolute;
-    top: -25px; right: -25px;
+    top: -28px; right: -28px;
     background: #FF3D9A;
     color: #fff;
     border: 3px solid #0D0D0D;
-    padding: 10px 14px;
+    padding: 10px;
     font-family: 'Bangers', cursive;
     letter-spacing: 2px;
     transform: rotate(15deg);
     border-radius: 50%;
     box-shadow: 4px 4px 0 #0D0D0D;
-    width: 80px; height: 80px;
+    width: 82px; height: 82px;
     display: grid; place-items: center;
     text-align: center;
-    line-height: 1;
-    font-size: 1.1rem;
+    line-height: 1.1;
+    font-size: 1.05rem;
   }
 
-  /* ---------- Confetti ---------- */
+  /* ============================================================
+     CONFETTI
+  ============================================================ */
   .confetti-container {
     position: fixed;
     inset: 0;
@@ -419,16 +553,22 @@
     to { transform: translateY(110vh) rotate(720deg); }
   }
 
-  /* ---------- Footer ---------- */
+  /* ============================================================
+     FOOTER
+  ============================================================ */
   footer {
     text-align: center;
-    margin-top: 30px;
-    font-size: 0.8rem;
-    color: #888;
-    letter-spacing: 1px;
+    margin-top: 36px;
+    font-size: 0.75rem;
+    color: #666;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    text-transform: uppercase;
   }
 
-  /* ---------- Toast ---------- */
+  /* ============================================================
+     TOAST
+  ============================================================ */
   .toast {
     position: fixed;
     bottom: 24px;
@@ -437,40 +577,41 @@
     background: #0D0D0D;
     color: #FFD93D;
     border: 3px solid #FFD93D;
-    padding: 10px 18px;
+    padding: 10px 20px;
     border-radius: 10px;
     font-family: 'Bangers', cursive;
     letter-spacing: 1.5px;
     z-index: 200;
     transition: transform 280ms cubic-bezier(.2,.9,.3,1.4);
     box-shadow: 5px 5px 0 #FF3D9A;
+    white-space: nowrap;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* ---------- Responsive ---------- */
+  /* ============================================================
+     MOBILE TWEAKS
+  ============================================================ */
   @media (max-width: 520px) {
     body { padding: 14px 10px 50px; }
     .board-card { padding: 12px; transform: rotate(-0.3deg); box-shadow: 6px 6px 0 #FF3D9A, 6px 6px 0 3px #0D0D0D; }
     .title-card { padding: 10px 22px 8px; box-shadow: 6px 6px 0 #FF3D9A, 6px 6px 0 3px #0D0D0D; }
-    .badge-burst { right: -10px; top: -16px; font-size: 0.8rem; padding: 6px 10px; }
-    .upload-icon { width: 70px; height: 70px; }
-    .upload-icon svg { width: 38px; height: 38px; }
-    .btn { font-size: 0.95rem; padding: 9px 14px; }
-    .hud-chip { min-width: 96px; padding: 6px 10px; }
+    .badge-burst { right: -10px; top: -16px; font-size: 0.78rem; padding: 6px 10px; }
+    .upload-icon { width: 66px; height: 66px; }
+    .upload-icon svg { width: 36px; height: 36px; }
+    .btn { font-size: 0.92rem; padding: 9px 13px; }
+    .hud-chip { min-width: 88px; padding: 7px 10px; }
     .hud-chip .value { font-size: 1.1rem; }
   }
 
-  /* hide native file input */
   #fileInput { display: none; }
-
 </style>
 </head>
 <body>
 
-<div class="wrap">
+<div class="page">
 
-  <!-- HEADER -->
-  <header>
+  <!-- ── HEADER ── -->
+  <header class="page-header">
     <div class="title-card">
       <h1>PUZZLE<span class="snap">SNAP</span></h1>
       <div class="badge-burst">POW!</div>
@@ -480,89 +621,170 @@
     </div>
   </header>
 
-  <!-- HUD -->
-  <div class="hud" id="hud" style="display:none;">
-    <div class="hud-chip yellow">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#FFD93D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M9 2h6"/></svg>
-      <div>
-        <div class="label">Time</div>
-        <div class="value" id="timerVal">00:00</div>
-      </div>
-    </div>
-    <div class="hud-chip pink">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#FF3D9A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
-      <div>
-        <div class="label">Moves</div>
-        <div class="value" id="movesVal">0</div>
-      </div>
-    </div>
-    <div class="hud-chip cyan">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#3DEBFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      <div>
-        <div class="label">Solved</div>
-        <div class="value" id="solvedVal">0/0</div>
-      </div>
-    </div>
-  </div>
+  <!-- ── MAIN LAYOUT ── -->
+  <div class="layout-grid">
 
-  <!-- BOARD -->
-  <div class="board-card">
-    <!-- Empty state -->
-    <div class="upload-zone" id="uploadZone">
-      <div class="upload-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17 8 12 3 7 8"/>
-          <line x1="12" y1="3" x2="12" y2="15"/>
-        </svg>
+    <!-- LEFT: Board -->
+    <div class="col-board">
+
+      <!-- HUD (mobile: above board) -->
+      <div class="hud" id="hud" style="display:none;">
+        <div class="hud-chip yellow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FFD93D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M9 2h6"/></svg>
+          <div>
+            <div class="label">Time</div>
+            <div class="value" id="timerVal">00:00</div>
+          </div>
+        </div>
+        <div class="hud-chip pink">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FF3D9A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+          <div>
+            <div class="label">Moves</div>
+            <div class="value" id="movesVal">0</div>
+          </div>
+        </div>
+        <div class="hud-chip cyan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3DEBFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <div>
+            <div class="label">Solved</div>
+            <div class="value" id="solvedVal">0/0</div>
+          </div>
+        </div>
       </div>
-      <div class="upload-text">DROP IMAGE HERE</div>
-      <div class="upload-sub">or click to browse</div>
-    </div>
 
-    <!-- Puzzle Stage (hidden initially) -->
-    <div class="puzzle-stage" id="puzzleStage" style="display:none;"></div>
+      <!-- Board card -->
+      <div class="board-card">
+        <div class="upload-zone" id="uploadZone">
+          <div class="upload-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div class="upload-text">DROP IMAGE HERE</div>
+          <div class="upload-sub">or click to browse</div>
+        </div>
+        <div class="puzzle-stage" id="puzzleStage" style="display:none;"></div>
+        <input type="file" id="fileInput" accept="image/*" />
+      </div>
 
-    <input type="file" id="fileInput" accept="image/*" />
-  </div>
+      <!-- Mobile-only controls -->
+      <div class="mobile-controls">
+        <div class="control-group">
+          <span class="group-label">Difficulty</span>
+          <button class="btn yellow active" data-diff="3">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 10l3-3 3 3"/></svg>
+            Easy 3×3
+          </button>
+          <button class="btn pink" data-diff="4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>
+            Medium 4×4
+          </button>
+          <button class="btn orange" data-diff="5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 9 22 9 17 14 19 22 12 17 5 22 7 14 2 9 9 9 12 2"/></svg>
+            Hard 5×5
+          </button>
+        </div>
+        <div class="control-group">
+          <button class="btn cyan" data-mobile-action="restart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15A9 9 0 1 0 6 5.3L1 10"/></svg>
+            Restart
+          </button>
+          <button class="btn pink" data-mobile-action="newimg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            New Image
+          </button>
+          <button class="btn yellow" data-mobile-action="peek" title="Hold to preview">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Peek
+          </button>
+        </div>
+      </div>
 
-  <!-- CONTROLS -->
-  <div class="controls">
-    <div class="control-group">
-      <span class="group-label">Difficulty</span>
-      <button class="btn yellow active" data-diff="3">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 10l3-3 3 3"/></svg>
-        Easy 3×3
-      </button>
-      <button class="btn pink" data-diff="4">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>
-        Medium 4×4
-      </button>
-      <button class="btn orange" data-diff="5">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 9 22 9 17 14 19 22 12 17 5 22 7 14 2 9 9 9 12 2"/></svg>
-        Hard 5×5
-      </button>
-    </div>
-    <div class="control-group">
-      <button class="btn cyan" id="restartBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15A9 9 0 1 0 6 5.3L1 10"/></svg>
-        Restart
-      </button>
-      <button class="btn pink" id="newImgBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        New Image
-      </button>
-      <button class="btn yellow" id="previewBtn" title="Hold to preview original">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        Peek
-      </button>
-    </div>
-  </div>
+    </div><!-- /col-board -->
+
+    <!-- RIGHT: Sidebar (desktop) -->
+    <div class="col-sidebar" id="desktopSidebar">
+
+      <!-- Desktop HUD inside sidebar card -->
+      <div class="sidebar-card" id="sidebarHudCard" style="margin-bottom:16px; display:none;">
+        <div class="hud" id="hudDesktop" style="display:flex; flex-direction:column; gap:10px; margin:0;">
+          <div class="hud-chip yellow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFD93D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M9 2h6"/></svg>
+            <div>
+              <div class="label">Time</div>
+              <div class="value" id="timerValD">00:00</div>
+            </div>
+          </div>
+          <div class="hud-chip pink">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FF3D9A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+            <div>
+              <div class="label">Moves</div>
+              <div class="value" id="movesValD">0</div>
+            </div>
+          </div>
+          <div class="hud-chip cyan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#3DEBFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <div>
+              <div class="label">Solved</div>
+              <div class="value" id="solvedValD">0/0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Difficulty -->
+      <div class="sidebar-card" style="margin-bottom:14px;">
+        <div class="sidebar-section">
+          <div class="section-label">Difficulty</div>
+          <div class="diff-group">
+            <button class="btn yellow active" data-diff="3">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 10l3-3 3 3"/></svg>
+              Easy 3×3
+            </button>
+            <button class="btn pink" data-diff="4">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>
+              Medium 4×4
+            </button>
+            <button class="btn orange" data-diff="5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 9 22 9 17 14 19 22 12 17 5 22 7 14 2 9 9 9 12 2"/></svg>
+              Hard 5×5
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="sidebar-card">
+        <div class="sidebar-section">
+          <div class="section-label">Actions</div>
+          <div class="action-group">
+            <button class="btn cyan" id="restartBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15A9 9 0 1 0 6 5.3L1 10"/></svg>
+              Restart
+            </button>
+            <button class="btn pink" id="newImgBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              New Image
+            </button>
+            <button class="btn yellow" id="previewBtn" title="Hold to preview original">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              Peek
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /col-sidebar -->
+
+  </div><!-- /layout-grid -->
 
   <footer>
     <p>PUZZLESNAP — DRAG, SWAP, SOLVE.</p>
   </footer>
-</div>
+
+</div><!-- /page -->
 
 <!-- WIN OVERLAY -->
 <div class="win-overlay" id="winOverlay">
@@ -585,41 +807,76 @@
 
 <script>
 (() => {
+  const DESKTOP_BP = 900; // sync with CSS
+
   // ============ State ============
   const state = {
-    img: null,             // HTMLImageElement
+    img: null,
     imgURL: null,
-    grid: 3,               // NxN
-    tiles: [],             // [{correctIdx, currentIdx, el}]
-    boardSize: 0,          // px
+    grid: 3,
+    tiles: [],
+    boardSize: 0,
     tileSize: 0,
-    selectedIdx: null,     // currently tapped tile (currentIdx position)
+    selectedIdx: null,
     moves: 0,
     timer: 0,
     timerInt: null,
     started: false,
     solved: false,
-    drag: null,            // active drag info
+    drag: null,
   };
 
   // ============ DOM refs ============
   const $ = (id) => document.getElementById(id);
-  const uploadZone = $('uploadZone');
-  const fileInput = $('fileInput');
-  const stage = $('puzzleStage');
-  const hud = $('hud');
-  const timerVal = $('timerVal');
-  const movesVal = $('movesVal');
-  const solvedVal = $('solvedVal');
-  const winOverlay = $('winOverlay');
-  const winTime = $('winTime');
-  const winMoves = $('winMoves');
+  const uploadZone    = $('uploadZone');
+  const fileInput     = $('fileInput');
+  const stage         = $('puzzleStage');
+  // mobile HUD
+  const hudMobile     = $('hud');
+  const timerVal      = $('timerVal');
+  const movesVal      = $('movesVal');
+  const solvedVal     = $('solvedVal');
+  // desktop HUD
+  const sidebarHudCard = $('sidebarHudCard');
+  const timerValD     = $('timerValD');
+  const movesValD     = $('movesValD');
+  const solvedValD    = $('solvedValD');
+  // win
+  const winOverlay    = $('winOverlay');
+  const winTime       = $('winTime');
+  const winMoves      = $('winMoves');
   const confettiContainer = $('confettiContainer');
-  const toast = $('toast');
+  const toast         = $('toast');
+
+  // ============ Responsive helpers ============
+  function isDesktop() {
+    return window.innerWidth >= DESKTOP_BP;
+  }
+
+  function showHUD(show) {
+    if (isDesktop()) {
+      hudMobile.style.display = 'none';
+      sidebarHudCard.style.display = show ? 'block' : 'none';
+    } else {
+      hudMobile.style.display = show ? 'flex' : 'none';
+      sidebarHudCard.style.display = 'none';
+    }
+  }
+
+  function setHUDValues(timer, moves, solved, total) {
+    // mobile
+    timerVal.textContent  = timer;
+    movesVal.textContent  = moves;
+    solvedVal.textContent = `${solved}/${total}`;
+    // desktop
+    timerValD.textContent  = timer;
+    movesValD.textContent  = moves;
+    solvedValD.textContent = `${solved}/${total}`;
+  }
 
   // ============ Utility ============
   const fmtTime = (s) => {
-    const m = Math.floor(s / 60).toString().padStart(2,'0');
+    const m  = Math.floor(s / 60).toString().padStart(2,'0');
     const ss = (s % 60).toString().padStart(2,'0');
     return `${m}:${ss}`;
   };
@@ -650,8 +907,7 @@
     if (f) loadFile(f);
   });
 
-  // also accept dropping on entire window
-  window.addEventListener('dragover', (e) => { e.preventDefault(); });
+  window.addEventListener('dragover', (e) => e.preventDefault());
   window.addEventListener('drop', (e) => {
     e.preventDefault();
     const f = e.dataTransfer.files && e.dataTransfer.files[0];
@@ -659,47 +915,41 @@
   });
 
   function loadFile(file) {
-    if (!file.type.startsWith('image/')) {
-      showToast('Image files only!');
-      return;
-    }
+    if (!file.type.startsWith('image/')) { showToast('Image files only!'); return; }
     if (state.imgURL) URL.revokeObjectURL(state.imgURL);
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
-      state.img = img;
+      state.img    = img;
       state.imgURL = url;
       showToast('Image loaded!');
       buildPuzzle();
     };
-    img.onerror = () => { showToast('Could not load image'); };
+    img.onerror = () => showToast('Could not load image');
     img.src = url;
   }
 
   // ============ Build Puzzle ============
   function buildPuzzle() {
-    state.solved = false;
-    state.moves = 0;
-    state.timer = 0;
-    state.started = false;
+    state.solved     = false;
+    state.moves      = 0;
+    state.timer      = 0;
+    state.started    = false;
     state.selectedIdx = null;
-    movesVal.textContent = '0';
-    timerVal.textContent = '00:00';
-    solvedVal.textContent = `0/${state.grid * state.grid}`;
     stopTimer();
+    setHUDValues('00:00', 0, 0, state.grid * state.grid);
+    showHUD(true);
 
     uploadZone.style.display = 'none';
-    stage.style.display = 'block';
-    hud.style.display = 'flex';
+    stage.style.display      = 'block';
 
     layoutTiles();
   }
 
   function measureBoard() {
-    // Stage is responsive; use bounding rect for accurate sizing
-    const rect = stage.getBoundingClientRect();
+    const rect     = stage.getBoundingClientRect();
     state.boardSize = Math.floor(rect.width);
-    state.tileSize = state.boardSize / state.grid;
+    state.tileSize  = state.boardSize / state.grid;
   }
 
   function layoutTiles() {
@@ -707,35 +957,26 @@
     stage.innerHTML = '';
     state.tiles = [];
 
-    const N = state.grid;
+    const N     = state.grid;
     const total = N * N;
-
-    // Build position permutation (currentIdx -> correctIdx)
-    const perm = shuffleSolvable(total);
-
+    const perm  = shuffleSolvable(total);
     const bgSize = `${state.boardSize}px ${state.boardSize}px`;
 
     for (let currentIdx = 0; currentIdx < total; currentIdx++) {
       const correctIdx = perm[currentIdx];
       const el = document.createElement('div');
       el.className = 'tile';
-      el.style.width = `${state.tileSize}px`;
+      el.style.width  = `${state.tileSize}px`;
       el.style.height = `${state.tileSize}px`;
-      el.style.backgroundImage = `url("${state.imgURL}")`;
-      el.style.backgroundSize = bgSize;
-
-      // Background position based on correctIdx (which slice this tile shows)
+      el.style.backgroundImage    = `url("${state.imgURL}")`;
+      el.style.backgroundSize     = bgSize;
       const cr = Math.floor(correctIdx / N);
       const cc = correctIdx % N;
       el.style.backgroundPosition = `-${cc * state.tileSize}px -${cr * state.tileSize}px`;
-
-      // Slight random rotation on the *image inside* would distort; instead rotate via tilt subtle? Keep tile rectangular for clean swap.
-
       stage.appendChild(el);
 
       const tile = { correctIdx, currentIdx, el };
       state.tiles.push(tile);
-
       bindTileEvents(tile);
       placeTile(tile, false);
       updateCorrectMark(tile);
@@ -743,12 +984,10 @@
     updateSolvedCount();
   }
 
-  // Generate shuffled positions; ensure not already solved
   function shuffleSolvable(n) {
     const arr = Array.from({ length: n }, (_, i) => i);
     let attempts = 0;
     do {
-      // Fisher-Yates
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -762,7 +1001,6 @@
     return true;
   }
 
-  // Place tile at its currentIdx position
   function placeTile(tile, animate = true) {
     const N = state.grid;
     const r = Math.floor(tile.currentIdx / N);
@@ -771,8 +1009,7 @@
     const y = r * state.tileSize;
     if (!animate) {
       tile.el.style.transition = 'none';
-      tile.el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      // force reflow then restore transition
+      tile.el.style.transform  = `translate3d(${x}px, ${y}px, 0)`;
       void tile.el.offsetWidth;
       tile.el.style.transition = '';
     } else {
@@ -786,20 +1023,17 @@
   }
 
   function updateSolvedCount() {
-    const total = state.grid * state.grid;
-    let solved = 0;
+    const total  = state.grid * state.grid;
+    let solved   = 0;
     state.tiles.forEach(t => { if (t.correctIdx === t.currentIdx) solved++; });
-    solvedVal.textContent = `${solved}/${total}`;
-    if (solved === total && !state.solved) {
-      onWin();
-    }
+    setHUDValues(fmtTime(state.timer), state.moves, solved, total);
+    if (solved === total && !state.solved) onWin();
   }
 
-  // ============ Tile interactions: click-to-swap + drag-to-swap ============
+  // ============ Tile events ============
   function bindTileEvents(tile) {
     const el = tile.el;
-
-    let pointerDown = null; // {x, y, time, moved, pointerId}
+    let pointerDown = null;
     const DRAG_THRESHOLD = 6;
 
     el.addEventListener('pointerdown', (e) => {
@@ -814,32 +1048,23 @@
       const dx = e.clientX - pointerDown.x;
       const dy = e.clientY - pointerDown.y;
       if (!pointerDown.moved && (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD)) {
-        // Begin drag
         pointerDown.moved = true;
         startDrag(tile, e);
       }
-      if (pointerDown.moved && state.drag && state.drag.tile === tile) {
-        moveDrag(e);
-      }
+      if (pointerDown.moved && state.drag && state.drag.tile === tile) moveDrag(e);
     });
 
     el.addEventListener('pointerup', (e) => {
       if (!pointerDown || pointerDown.pointerId !== e.pointerId) return;
       const wasDrag = pointerDown.moved;
       try { el.releasePointerCapture(e.pointerId); } catch(_) {}
-      if (wasDrag && state.drag && state.drag.tile === tile) {
-        endDrag(e);
-      } else {
-        // Click-to-select swap
-        handleTap(tile);
-      }
+      if (wasDrag && state.drag && state.drag.tile === tile) endDrag(e);
+      else handleTap(tile);
       pointerDown = null;
     });
 
     el.addEventListener('pointercancel', (e) => {
-      if (state.drag && state.drag.tile === tile) {
-        cancelDrag();
-      }
+      if (state.drag && state.drag.tile === tile) cancelDrag();
       pointerDown = null;
     });
   }
@@ -851,22 +1076,17 @@
       return;
     }
     if (state.selectedIdx === tile.currentIdx) {
-      // deselect
       tile.el.classList.remove('selected');
       state.selectedIdx = null;
       return;
     }
     const other = state.tiles.find(t => t.currentIdx === state.selectedIdx);
-    if (other) {
-      other.el.classList.remove('selected');
-      swapTiles(other, tile);
-    }
+    if (other) { other.el.classList.remove('selected'); swapTiles(other, tile); }
     state.selectedIdx = null;
   }
 
-  // ----- Drag mechanics -----
+  // ---- Drag ----
   function startDrag(tile, e) {
-    // clear any selection visual
     if (state.selectedIdx !== null) {
       const sel = state.tiles.find(t => t.currentIdx === state.selectedIdx);
       if (sel) sel.el.classList.remove('selected');
@@ -876,49 +1096,36 @@
     const N = state.grid;
     const r = Math.floor(tile.currentIdx / N);
     const c = tile.currentIdx % N;
-    const baseX = c * state.tileSize;
-    const baseY = r * state.tileSize;
-    const tileLeft = stageRect.left + baseX;
-    const tileTop = stageRect.top + baseY;
-    state.drag = {
-      tile,
-      offsetX: e.clientX - tileLeft,
-      offsetY: e.clientY - tileTop,
-      stageRect
-    };
+    const tileLeft = stageRect.left + c * state.tileSize;
+    const tileTop  = stageRect.top  + r * state.tileSize;
+    state.drag = { tile, offsetX: e.clientX - tileLeft, offsetY: e.clientY - tileTop, stageRect };
     tile.el.classList.add('dragging');
   }
 
   function moveDrag(e) {
     const { tile, offsetX, offsetY, stageRect } = state.drag;
     const x = e.clientX - stageRect.left - offsetX;
-    const y = e.clientY - stageRect.top - offsetY;
+    const y = e.clientY - stageRect.top  - offsetY;
     tile.el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
   }
 
   function endDrag(e) {
     const { tile, stageRect } = state.drag;
     tile.el.classList.remove('dragging');
-    // Find target slot under pointer
     const px = e.clientX - stageRect.left;
     const py = e.clientY - stageRect.top;
-    const N = state.grid;
+    const N  = state.grid;
     let target = null;
     if (px >= 0 && py >= 0 && px < state.boardSize && py < state.boardSize) {
       const tc = Math.floor(px / state.tileSize);
       const tr = Math.floor(py / state.tileSize);
       const targetIdx = tr * N + tc;
-      if (targetIdx !== tile.currentIdx) {
+      if (targetIdx !== tile.currentIdx)
         target = state.tiles.find(t => t.currentIdx === targetIdx);
-      }
     }
     state.drag = null;
-    if (target) {
-      swapTiles(tile, target);
-    } else {
-      // snap back
-      placeTile(tile, true);
-    }
+    if (target) swapTiles(tile, target);
+    else placeTile(tile, true);
   }
 
   function cancelDrag() {
@@ -929,7 +1136,7 @@
     placeTile(tile, true);
   }
 
-  // ----- Swap -----
+  // ---- Swap ----
   function swapTiles(a, b) {
     if (!state.started) startTimer();
     const tmp = a.currentIdx;
@@ -946,7 +1153,6 @@
     updateCorrectMark(a);
     updateCorrectMark(b);
     state.moves++;
-    movesVal.textContent = state.moves;
     updateSolvedCount();
   }
 
@@ -956,7 +1162,9 @@
     stopTimer();
     state.timerInt = setInterval(() => {
       state.timer++;
-      timerVal.textContent = fmtTime(state.timer);
+      // sync both HUD locations
+      timerVal.textContent  = fmtTime(state.timer);
+      timerValD.textContent = fmtTime(state.timer);
     }, 1000);
   }
   function stopTimer() {
@@ -967,46 +1175,41 @@
   function onWin() {
     state.solved = true;
     stopTimer();
-    winTime.textContent = fmtTime(state.timer);
+    winTime.textContent  = fmtTime(state.timer);
     winMoves.textContent = state.moves;
-    setTimeout(() => {
-      winOverlay.classList.add('show');
-      launchConfetti();
-    }, 350);
+    setTimeout(() => { winOverlay.classList.add('show'); launchConfetti(); }, 350);
   }
 
   function launchConfetti() {
-    const colors = ['#FFD93D', '#FF3D9A', '#3DEBFF', '#FF6B35', '#fff'];
-    const count = 80;
+    const colors = ['#FFD93D','#FF3D9A','#3DEBFF','#FF6B35','#fff'];
     confettiContainer.innerHTML = '';
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < 80; i++) {
       const c = document.createElement('div');
       c.className = 'confetti';
-      const left = Math.random() * 100;
-      const dur = 2.4 + Math.random() * 2.2;
-      const delay = Math.random() * 0.6;
       const color = colors[Math.floor(Math.random() * colors.length)];
-      const w = 8 + Math.random() * 10;
+      const dur   = 2.4 + Math.random() * 2.2;
+      const delay = Math.random() * 0.6;
+      const w = 8  + Math.random() * 10;
       const h = 12 + Math.random() * 14;
-      const rotStart = Math.random() * 360;
-      c.style.left = left + 'vw';
-      c.style.background = color;
-      c.style.width = w + 'px';
-      c.style.height = h + 'px';
+      c.style.left              = (Math.random() * 100) + 'vw';
+      c.style.background        = color;
+      c.style.width             = w + 'px';
+      c.style.height            = h + 'px';
       c.style.animationDuration = dur + 's';
-      c.style.animationDelay = delay + 's';
-      c.style.transform = `rotate(${rotStart}deg)`;
+      c.style.animationDelay    = delay + 's';
+      c.style.transform         = `rotate(${Math.random()*360}deg)`;
       if (Math.random() > 0.6) c.style.borderRadius = '50%';
       confettiContainer.appendChild(c);
     }
-    setTimeout(() => { confettiContainer.innerHTML = ''; }, 6000);
+    setTimeout(() => confettiContainer.innerHTML = '', 6000);
   }
 
   // ============ Controls ============
   document.querySelectorAll('[data-diff]').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('[data-diff]').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      // activate all buttons with same diff value (mobile + desktop dupes)
+      document.querySelectorAll(`[data-diff="${btn.dataset.diff}"]`).forEach(b => b.classList.add('active'));
       state.grid = parseInt(btn.dataset.diff, 10);
       if (state.img) buildPuzzle();
     });
@@ -1016,33 +1219,36 @@
     if (!state.img) { showToast('Upload an image first'); return; }
     buildPuzzle();
   });
-
-  $('newImgBtn').addEventListener('click', () => {
-    resetAll();
-    fileInput.click();
-  });
-
+  $('newImgBtn').addEventListener('click', () => { resetAll(); fileInput.click(); });
   $('winAgainBtn').addEventListener('click', () => {
     winOverlay.classList.remove('show');
     confettiContainer.innerHTML = '';
     if (state.img) buildPuzzle();
   });
 
-  // Peek: hold to show original briefly via overlay tile
+  // Mobile duplicate action buttons
+  document.querySelectorAll('[data-mobile-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const act = btn.dataset.mobileAction;
+      if (act === 'restart') { if (!state.img) { showToast('Upload an image first'); return; } buildPuzzle(); }
+      if (act === 'newimg')  { resetAll(); fileInput.click(); }
+    });
+  });
+
+  // Peek
   const peekBtn = $('previewBtn');
   let peekEl = null;
   function showPeek() {
     if (!state.img || peekEl) return;
     peekEl = document.createElement('div');
-    peekEl.style.position = 'absolute';
-    peekEl.style.inset = '0';
-    peekEl.style.backgroundImage = `url("${state.imgURL}")`;
-    peekEl.style.backgroundSize = '100% 100%';
-    peekEl.style.zIndex = '60';
-    peekEl.style.pointerEvents = 'none';
-    peekEl.style.opacity = '0';
-    peekEl.style.transition = 'opacity 180ms ease';
-    peekEl.style.border = '3px dashed #FFD93D';
+    Object.assign(peekEl.style, {
+      position:'absolute', inset:'0',
+      backgroundImage:`url("${state.imgURL}")`,
+      backgroundSize:'100% 100%',
+      zIndex:'60', pointerEvents:'none',
+      opacity:'0', transition:'opacity 180ms ease',
+      border:'3px dashed #FFD93D'
+    });
     stage.appendChild(peekEl);
     requestAnimationFrame(() => { peekEl.style.opacity = '1'; });
   }
@@ -1052,41 +1258,45 @@
     el.style.opacity = '0';
     setTimeout(() => el.remove(), 200);
   }
-  ['pointerdown'].forEach(ev => peekBtn.addEventListener(ev, (e) => { e.preventDefault(); showPeek(); }));
+  peekBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); showPeek(); });
   ['pointerup','pointerleave','pointercancel'].forEach(ev => peekBtn.addEventListener(ev, hidePeek));
+
+  // Mobile peek too
+  document.querySelectorAll('[data-mobile-action="peek"]').forEach(btn => {
+    btn.addEventListener('pointerdown', (e) => { e.preventDefault(); showPeek(); });
+    ['pointerup','pointerleave','pointercancel'].forEach(ev => btn.addEventListener(ev, hidePeek));
+  });
 
   function resetAll() {
     stopTimer();
     state.img = null;
     if (state.imgURL) { URL.revokeObjectURL(state.imgURL); state.imgURL = null; }
     state.tiles = [];
-    state.moves = 0;
-    state.timer = 0;
-    state.started = false;
-    state.solved = false;
-    state.selectedIdx = null;
-    stage.innerHTML = '';
-    stage.style.display = 'none';
+    state.moves = 0; state.timer = 0;
+    state.started = false; state.solved = false; state.selectedIdx = null;
+    stage.innerHTML       = '';
+    stage.style.display   = 'none';
     uploadZone.style.display = 'flex';
-    hud.style.display = 'none';
+    showHUD(false);
     winOverlay.classList.remove('show');
     confettiContainer.innerHTML = '';
   }
 
-  // ============ Resize handling ============
+  // ============ Resize ============
   let resizeT;
   window.addEventListener('resize', () => {
+    // recompute HUD visibility on breakpoint crossing
+    if (state.img) showHUD(true);
     if (!state.img || state.tiles.length === 0) return;
     clearTimeout(resizeT);
     resizeT = setTimeout(() => {
-      // Recompute board size & re-position tiles
       measureBoard();
       const bgSize = `${state.boardSize}px ${state.boardSize}px`;
       state.tiles.forEach(t => {
-        t.el.style.width = state.tileSize + 'px';
+        t.el.style.width  = state.tileSize + 'px';
         t.el.style.height = state.tileSize + 'px';
         t.el.style.backgroundSize = bgSize;
-        const N = state.grid;
+        const N  = state.grid;
         const cr = Math.floor(t.correctIdx / N);
         const cc = t.correctIdx % N;
         t.el.style.backgroundPosition = `-${cc * state.tileSize}px -${cr * state.tileSize}px`;
@@ -1095,8 +1305,10 @@
     }, 120);
   });
 
-  // Prevent default drag-image ghost on tiles
   stage.addEventListener('dragstart', (e) => e.preventDefault());
+
+  // Initial HUD state
+  showHUD(false);
 
 })();
 </script>
